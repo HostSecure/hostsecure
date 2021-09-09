@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/HostSecureIcons/18x18/computer.png</file>
+        <file>icons/HostSecureIcons/18x18/home.png</file>
+        <file>icons/HostSecureIcons/18x18/memory-stick.png</file>
+        <file>icons/HostSecureIcons/36x36/computer.png</file>
+        <file>icons/HostSecureIcons/36x36/home.png</file>
+        <file>icons/HostSecureIcons/36x36/memory-stick.png</file>
+        <file>icons/HostSecureIcons/48x48/computer.png</file>
+        <file>icons/HostSecureIcons/48x48/home.png</file>
+        <file>icons/HostSecureIcons/48x48/memory-stick.png</file>
+        <file>icons/HostSecureIcons/index.theme</file>
+    </qresource>
+</RCC>

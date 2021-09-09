@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/Common">
+        <file>Colors.qml</file>
+        <file>qmldir</file>
+        <file>SizeTestRectangle.qml</file>
+        <file>VerticalTabBar.qml</file>
+        <file>TransparentPane.qml</file>
+    </qresource>
+</RCC>

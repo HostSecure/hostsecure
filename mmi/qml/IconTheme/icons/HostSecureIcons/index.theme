@@ -1,0 +1,17 @@
+[Icon Theme]
+Name=HostSecureIcons
+Comment=My Icon Theme
+
+Directories=18x18,36x36,48x48
+
+[18x18]
+Size=18
+Type=Fixed
+
+[36x36]
+Size=36
+Type=Fixed
+
+[48x48]
+Size=36
+Type=Fixed

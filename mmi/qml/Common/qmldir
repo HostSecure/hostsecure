@@ -1,0 +1,5 @@
+module Common
+singleton Colors  1.0 Colors.qml
+SizeTestRectangle 1.0 SizeTestRectangle.qml
+VerticalTabBar    1.0 VerticalTabBar.qml
+TransparentPane   1.0 TransparentPane.qml

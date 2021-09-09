@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/Images">
+        <file>HostSecureLogo.png</file>
+        <file>gradient.jpg</file>
+    </qresource>
+</RCC>

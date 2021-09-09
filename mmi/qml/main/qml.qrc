@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>qtquickcontrols2.conf</file>
+        <file>TopBar.qml</file>
+        <file>MainView.qml</file>
+        <file>HomeView.qml</file>
+        <file>DeviceView.qml</file>
+        <file>EdgeView.qml</file>
+    </qresource>
+</RCC>
