@@ -6,12 +6,8 @@
 #include <unistd.h>
 
 #include "USBServiceHandler.h"
+#include "uplinkhandler.h"
 
-namespace
-{
-    int ARG_LIMIT = 255;
-    int ARGC_LIMIT = 10;
-}
 
 int main(int argc, char *argv[])
 {
@@ -21,9 +17,6 @@ int main(int argc, char *argv[])
     sh.listRules("");
     //sh.appendRule("allow id *:* with-interface 03:00:00",1,0);
     //sh.listDevices("block");
-
-    std::string exec_name = argv[0];
-    std::string input_arg;
 
     return a.exec();
 }

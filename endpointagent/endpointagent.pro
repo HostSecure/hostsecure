@@ -1,5 +1,5 @@
 QT -= gui
-QT += dbus network
+QT += dbus network mqtt
 
 CONFIG += c++17 console
 CONFIG -= app_bundle
@@ -27,9 +27,6 @@ HEADERS += \
     src/rulehandler.h \
     src/uplinkhandler.h
 
-DISTFILES += \
-    ../../../usbguard/src/DBus/DBusInterface.xml \
-    DBusInterface.xml
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
