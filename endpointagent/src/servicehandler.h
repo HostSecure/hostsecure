@@ -16,15 +16,15 @@ QString DBUS_POLICY_PATH     =  "/org/usbguard1/Policy";
 QString DBUS_DEVICES_INTERFACE= "org.usbguard.Devices1";
 QString DBUS_DEVICES_PATH     = "/org/usbguard1/Devices";
 }
-class USBServiceHandler : public QObject
+class ServiceHandler : public QObject
 {
     Q_OBJECT
 public:
-    explicit USBServiceHandler(QObject *parent = nullptr);
+    explicit ServiceHandler(QObject *parent = nullptr);
 
-//    QDBusInterface *ifaceUSBGuardRoot;
-    QDBusInterface *ifaceUSBGuardPolicy;
-    QDBusInterface *ifaceUSBGuardDevices;
+//    QDBusInterface *m_ifaceUSBGuardRoot;
+    QDBusInterface *m_ifaceUSBGuardPolicy;
+    QDBusInterface *m_ifaceUSBGuardDevices;
 
 
     //USBGUARD_ROOT
@@ -38,6 +38,12 @@ public:
     void listDevices(QString query); // out a(us) devices
     void applyDevicePolicy(uint id, uint target, bool permanent);
 
+signals:
+    void devicePresenceUpdate(QString device_id, QString device_serial,
+                             uint target, QString interface, uint event);
+
+    void devicePolicyUpdate(QString device_id, QString device_serial,
+                             uint target, QString interface);
 
 public slots:
     //USBGUARD_ROOT
