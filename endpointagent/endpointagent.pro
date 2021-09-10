@@ -14,17 +14,17 @@ INCLUDEPATH += src
 
 SOURCES += \
     main.cpp \
-    src/USBServiceHandler.cpp \
     src/detector.cpp \
     src/parser.cpp \
     src/rulehandler.cpp \
+    src/servicehandler.cpp \
     src/uplinkhandler.cpp
 
 HEADERS += \
-    src/USBServiceHandler.h \
     src/detector.h \
     src/parser.h \
     src/rulehandler.h \
+    src/servicehandler.h \
     src/uplinkhandler.h
 
 
