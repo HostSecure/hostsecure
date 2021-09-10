@@ -12,6 +12,10 @@ CONFIG -= app_bundle
 
 INCLUDEPATH += src
 
+DEPENDPATH += ../messagehandler/lib/include
+INCLUDEPATH += ../messagehandler/lib/include
+LIBS += -L../messagehandler/lib -lmessagehandler
+
 SOURCES += \
     main.cpp \
     src/detector.cpp \
