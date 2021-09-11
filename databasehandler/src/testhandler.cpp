@@ -155,7 +155,7 @@ void TestHandler::testCaseDevice(bool requiredDataExists)
         m_DBHandler->getAllProductVendors(productVendors);
         Q_ASSERT(productVendors.size() == 3);
 
-        for(int i = 0; i < productVendors.size() - 1; ++i)
+        for(uint i = 0; i < productVendors.size() - 1; ++i)
         {
             m_DBHandler->registerDevice(productVendors[i]->productId, productVendors[i]->vendorId, QString::number(i + 1000));
         }
@@ -229,7 +229,6 @@ void TestHandler::testCaseLog(bool requiredDataExists)
 
         DatabaseHandler::LogEvent logEvent;
         Q_ASSERT(m_DBHandler->getLoggedEvent(logEvent, edgeKeys[2], devices[2]->productId, devices[2]->vendorId, "2021:09:09 22:36:00:002", devices[2]->serialNumber));
-        qInfo() << logEvent.eventDescription;
 
         std::vector<std::unique_ptr<DatabaseHandler::LogEvent>> logEvents;
         m_DBHandler->getAllLoggedEvents(logEvents);

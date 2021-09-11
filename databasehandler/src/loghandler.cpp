@@ -74,31 +74,28 @@ void loghandler(QtMsgType type, const QMessageLogContext &context, const QString
 LogHandler::LogHandler()
 {
     QString logFileName = QDateTime::currentDateTime().toString() + ".txt";
-    QString logFilePath;
 
-    const char* tempPath = getenv("LOG_FILE_DIR");
-    if(tempPath == nullptr)
+    const char* dataDir = getenv("HOSTSECURE_DATA_DIR");
+    if(dataDir == nullptr)
     {
-        logFilePath = QDir::currentPath() + "/logs";
-    }
-    else
-    {
-        logFilePath = tempPath;
+        dataDir = ".";
     }
 
-    logFilePath += "/";
+    QString logFilePath(dataDir);
+    logFilePath.append("/Logs/");
 
     QDir dir(logFilePath);
     if(!dir.exists())
     {
-        if(!dir.mkpath(logFilePath))
+        if(!dir.mkpath(dir.absolutePath()))
         {
-            qCritical() << "Failed to create logging path: " << logFilePath;
+            qCritical() << "Failed to create logging path: " << dir.absolutePath();
             return;
         }
     }
 
     logFile.setFileName(logFilePath + logFileName);
+
     if(logFile.open(QIODevice::ReadWrite))
     {
         logFile.close();

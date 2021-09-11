@@ -1,7 +1,9 @@
 #include "databasehandler.h"
+#include "databasedatafileparser.h"
 
 #include <QDebug>
 #include <QFile>
+#include <QDir>
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlError>
@@ -34,6 +36,18 @@ DatabaseHandler::DatabaseHandler(const QString& databasePath)
 {
     //TODO: Handle differently, e.g. by using a SELECT call on some table to make it support other db types (e.g. MariaDB/MySQL)
     bool exists = QFile::exists(databasePath);
+    if(!exists)
+    {
+        QDir dir = QFileInfo(databasePath).absoluteDir();
+        if(!dir.exists())
+        {
+            if(!dir.mkpath(dir.absolutePath()))
+            {
+                qCritical() << "Failed to create database path: " << dir.absolutePath();
+                return;
+            }
+        }
+    }
 
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName(databasePath);
@@ -49,14 +63,11 @@ DatabaseHandler::DatabaseHandler(const QString& databasePath)
 
         if(!exists)
         {
-//            query.exec(CREATE + EDGENODE + "(" + EDGENODEID + " " + EDGENODEIDTYPE + " " + PRIMARY + ", " + EDGENODEDESCRIPTTION + " " + EDGENODEDESCRIPTIONTYPE + ")");
             if(!query.exec("CREATE TABLE edgenode(macaddress VARCHAR(8) PRIMARY KEY, isonline BIT NOT NULL, lastheartbeat TIMESTAMP NOT NULL)"))
             {
                 qFatal("Failed to create edgenode table: %s", query.lastError().text().toStdString().c_str());
             }
-//            query.exec(CREATE + VENDOR + "(" + VENDORID + " " + VENDORIDTYPE + " " + PRIMARY + ", " + VENDORNAME + " " + VENDORNAMETYPE + ")");
-//            query.exec("CREATE TABLE vendor(vendorid VARCHAR(4) PRIMARY KEY, vendorname VARCHAR(30))");
-//            query.exec("CREATE TABLE product(productid VARCHAR(4) PRIMARY KEY, productname VARCHAR(30))");
+
             if(!query.exec("CREATE TABLE virushash(hashkey VARCHAR(32) PRIMARY KEY, description VARCHAR(100))"))
             {
                 qFatal("Failed to create virushash table: %s", query.lastError().text().toStdString().c_str());
@@ -86,7 +97,8 @@ DatabaseHandler::DatabaseHandler(const QString& databasePath)
                 qFatal("Failed to create log table: %s", query.lastError().text().toStdString().c_str());
             }
 
-            // TODO: Import data
+            DatabaseDataFileParser::parseDeviceProductVendor(*this);
+            DatabaseDataFileParser::parseVirusHash(*this);
         }
     }
 }

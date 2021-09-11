@@ -11,15 +11,20 @@ int main(int argc, char *argv[])
 
     QCoreApplication a(argc, argv);
 
-    // TODO: Nobody likes hardcoded paths
+    const char* dataDir = getenv("HOSTSECURE_DATA_DIR");
+    if(dataDir == nullptr)
+    {
+        dataDir = ".";
+    }
+
     if(test)
     {
-        TestHandler testHandler("/home/kali/QtProjects/TestDatabase/testcases.db");
+        TestHandler testHandler(QString(dataDir).append("/Databases/testcases.db"));
         testHandler.testCaseAll();
     }
     else
     {
-        DatabaseHandler dbHandler("/home/kali/QtProjects/TestDatabase/test.db");
+        DatabaseHandler dbHandler(QString(dataDir).append("/Databases/test.db"));
     }
 
     return a.exec();

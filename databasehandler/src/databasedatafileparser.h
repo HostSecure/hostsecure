@@ -6,8 +6,8 @@ class DatabaseHandler;
 class DatabaseDataFileParser
 {
 public:
-    static void parseDeviceProductVendor(DatabaseHandler* dbHandler);
-    static void parseVirusHash(DatabaseHandler* dbHandler);
+    static void parseDeviceProductVendor(DatabaseHandler& dbHandler);
+    static void parseVirusHash(DatabaseHandler& dbHandler);
 
 private:
     DatabaseDataFileParser();
