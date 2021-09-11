@@ -6,7 +6,7 @@
 
 namespace
 {
-QFile logFile;;
+QFile logFile;
 }
 
 // Taken from qInstallMessageHandler example code

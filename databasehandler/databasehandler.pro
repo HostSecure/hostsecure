@@ -12,11 +12,13 @@ INCLUDEPATH += src
 
 SOURCES += \
     main.cpp \
+    src/databasedatafileparser.cpp \
     src/databasehandler.cpp \
     src/loghandler.cpp \
     src/testhandler.cpp
 
 HEADERS += \
+    src/databasedatafileparser.h \
     src/databasehandler.h \
     src/loghandler.h \
     src/testhandler.h

@@ -1,5 +1,4 @@
 #include <QCoreApplication>
-#include <QDir>
 
 #include "loghandler.h"
 #include "databasehandler.h"
@@ -15,12 +14,12 @@ int main(int argc, char *argv[])
     // TODO: Nobody likes hardcoded paths
     if(test)
     {
-        TestHandler testHandler("testcases.db");
+        TestHandler testHandler("/home/kali/QtProjects/TestDatabase/testcases.db");
         testHandler.testCaseAll();
     }
     else
     {
-        DatabaseHandler dbHandler("test.db");
+        DatabaseHandler dbHandler("/home/kali/QtProjects/TestDatabase/test.db");
     }
 
     return a.exec();

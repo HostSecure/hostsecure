@@ -44,32 +44,47 @@ DatabaseHandler::DatabaseHandler(const QString& databasePath)
     }
     else
     {
+        QSqlQuery query;
+        query.exec("PRAGMA foreign_keys = ON;");
+
         if(!exists)
         {
-            QSqlQuery query;
 //            query.exec(CREATE + EDGENODE + "(" + EDGENODEID + " " + EDGENODEIDTYPE + " " + PRIMARY + ", " + EDGENODEDESCRIPTTION + " " + EDGENODEDESCRIPTIONTYPE + ")");
-            query.exec("CREATE TABLE edgenode(macaddress VARCHAR(8) PRIMARY KEY, isonline BIT NOT NULL, lastheartbeat TIMESTAMP NOT NULL)");
+            if(!query.exec("CREATE TABLE edgenode(macaddress VARCHAR(8) PRIMARY KEY, isonline BIT NOT NULL, lastheartbeat TIMESTAMP NOT NULL)"))
+            {
+                qFatal("Failed to create edgenode table: %s", query.lastError().text().toStdString().c_str());
+            }
 //            query.exec(CREATE + VENDOR + "(" + VENDORID + " " + VENDORIDTYPE + " " + PRIMARY + ", " + VENDORNAME + " " + VENDORNAMETYPE + ")");
-            query.exec("CREATE TABLE vendor(vendorid VARCHAR(4) PRIMARY KEY, vendorname VARCHAR(30))");
-            query.exec("CREATE TABLE product(productid VARCHAR(4) PRIMARY KEY, productname VARCHAR(30))");
-            query.exec("CREATE TABLE virushash(hashkey VARCHAR(32) PRIMARY KEY, description VARCHAR(100))");
+//            query.exec("CREATE TABLE vendor(vendorid VARCHAR(4) PRIMARY KEY, vendorname VARCHAR(30))");
+//            query.exec("CREATE TABLE product(productid VARCHAR(4) PRIMARY KEY, productname VARCHAR(30))");
+            if(!query.exec("CREATE TABLE virushash(hashkey VARCHAR(32) PRIMARY KEY, description VARCHAR(100))"))
+            {
+                qFatal("Failed to create virushash table: %s", query.lastError().text().toStdString().c_str());
+            }
 
-            query.exec("CREATE TABLE devicedata(productid VARCHAR(4), vendorid VARCHAR(4), "
-                                               "FOREIGN KEY(productid) REFERENCES product(productid), "
-                                               "FOREIGN KEY (vendorid) REFERENCES vendor(vendorid), "
-                                               "PRIMARY KEY(productid, vendorid))");
+            if(!query.exec("CREATE TABLE productvendor(productid VARCHAR(4), vendorid VARCHAR(4), productname VARCHAR(30), vendorname VARCHAR(30),"
+                                                      "PRIMARY KEY(productid, vendorid))"))
+            {
+                qFatal("Failed to create productvendor table: %s", query.lastError().text().toStdString().c_str());
+            }
 
-            query.exec("CREATE TABLE device(serialnumber VARCHAR(8) PRIMARY KEY, productid VARCHAR(4) NOT NULL, vendorid VARCHAR(4) NOT NULL, status CHAR(1) NOT NULL, "
-                                           "FOREIGN KEY(productid) REFERENCES devicedata(productid), "
-                                           "FOREIGN KEY(vendorid) REFERENCES devicedata(vendorid))");
+            if(!query.exec("CREATE TABLE device(id INTEGER PRIMARY KEY AUTOINCREMENT, productid VARCHAR(4), vendorid VARCHAR(4), serialnumber VARCHAR(8), status CHAR(1) NOT NULL, "
+                       "UNIQUE(productid, vendorid, serialnumber),"
+                       "FOREIGN KEY(productid, vendorid) REFERENCES productvendor(productid, vendorid))"))
+            {
+                qFatal("Failed to create device table: %s", query.lastError().text().toStdString().c_str());
+            }
 
-            query.exec("CREATE TABLE log(edgenodemacaddress VARCHAR(8), "
-                                        "deviceid VARCHAR(8), "
-                                        "logtime TIMESTAMP, "
-                                        "loginfo VARCHAR(100), "
-                                        "FOREIGN KEY (edgenodemacaddress) REFERENCES edgenode(macaddress), "
-                                        "FOREIGN KEY (deviceid) REFERENCES device(serialnumber), "
-                                        "PRIMARY KEY(edgenodemacaddress, deviceid, logtime))");
+            if(!query.exec("CREATE TABLE log(edgenodemacaddress VARCHAR(8), "
+                       "deviceid INTEGER, "
+                       "logtime TIMESTAMP, "
+                       "loginfo VARCHAR(100), "
+                       "FOREIGN KEY (edgenodemacaddress) REFERENCES edgenode(macaddress), "
+                       "FOREIGN KEY (deviceid) REFERENCES device(id), "
+                       "PRIMARY KEY(edgenodemacaddress, deviceid, logtime))"))
+            {
+                qFatal("Failed to create log table: %s", query.lastError().text().toStdString().c_str());
+            }
 
             // TODO: Import data
         }
@@ -79,7 +94,8 @@ DatabaseHandler::DatabaseHandler(const QString& databasePath)
 void DatabaseHandler::registerEdgeNode(const QString &macaddress, bool isOnline, const QString& lastHeartbeatTimestamp) const
 {
     QSqlQuery query;
-    query.prepare("INSERT INTO edgenode(macaddress, isonline, lastheartbeat)"
+    // NOT an UPSERT, but it's ok as we update every attribute of the table and we don't use an auto id.
+    query.prepare("INSERT OR REPLACE INTO edgenode(macaddress, isonline, lastheartbeat)"
                   "VALUES(?, ?, ?)");
     query.bindValue(0, macaddress);
     query.bindValue(1, (isOnline ? 1 : 0));
@@ -92,7 +108,7 @@ void DatabaseHandler::registerEdgeNode(const QString &macaddress, bool isOnline,
     }
 }
 
-bool DatabaseHandler::getEdgeNode(const QString &macAddress, EdgeNode &edgeNode) const
+bool DatabaseHandler::getEdgeNode(EdgeNode &edgeNode, const QString &macAddress) const
 {
     bool success = false;
     QSqlQuery query;
@@ -185,15 +201,23 @@ void DatabaseHandler::getOnlineEdgeNodes(QVector<QString> &macAddresses) const
     }
 }
 
-void DatabaseHandler::registerDevice(const QString &serialNumber, const QString &vendorId, const QString &productId) const
+void DatabaseHandler::registerDevice(const QString &productId, const QString &vendorId, const QString &serialNumber ) const
 {
     QSqlQuery query;
-    query.prepare("INSERT INTO device(serialnumber, productid, vendorid, status)"
-                  "VALUES(?, ?, ?, ?");
-    query.bindValue(0, serialNumber);
+
+    // Ignore if it exists
+    query.prepare("INSERT INTO device(productid, vendorid, serialnumber, status) "
+                  "SELECT ?, ?, ?, ? "
+                  "WHERE NOT EXISTS(SELECT * "
+                                   "FROM device "
+                                   "WHERE productid = ? AND vendorid = ? AND serialnumber = ?)");
+    query.bindValue(0, productId);
     query.bindValue(1, vendorId);
-    query.bindValue(2, productId);
+    query.bindValue(2, serialNumber);
     query.bindValue(3, DEVICE_STATUS_UNKNOWN);
+    query.bindValue(4, productId);
+    query.bindValue(5, vendorId);
+    query.bindValue(6, serialNumber);
 
     if(!query.exec())
     {
@@ -202,20 +226,22 @@ void DatabaseHandler::registerDevice(const QString &serialNumber, const QString 
     }
 }
 
-bool DatabaseHandler::getDevice(const QString &serialNumber, Device &device) const
+bool DatabaseHandler::getDevice(Device &device, const QString &productId, const QString &vendorId, const QString &serialNumber) const
 {
     bool success = false;
     QSqlQuery query;
-    query.prepare("SELECT * FROM device WHERE serialnumber = ?");
-    query.bindValue(0, serialNumber);
+    query.prepare("SELECT productid, vendorid, serialnumber FROM device WHERE productid = ? AND vendorid = ? AND serialnumber = ?");
+    query.bindValue(0, productId);
+    query.bindValue(1, vendorId);
+    query.bindValue(2, serialNumber);
 
     if(query.exec())
     {
         if(query.next())
         {
-            device.serialNumber = query.value(0).toString();
+            device.productId = query.value(0).toString();
             device.vendorId = query.value(1).toString();
-            device.productId = query.value(2).toString();
+            device.serialNumber = query.value(2).toString();
             success = true;
         }
     }
@@ -228,30 +254,17 @@ bool DatabaseHandler::getDevice(const QString &serialNumber, Device &device) con
     return success;
 }
 
-void DatabaseHandler::getAllDeviceKeys(QVector<QString> &serialNumbers) const
-{
-    try
-    {
-        getKeysFromTable("serialnumber", "device",  serialNumbers);
-    }
-    catch(std::exception& e)
-    {
-        qCritical() <<  __PRETTY_FUNCTION__ << e.what();
-        throw e;
-    }
-}
-
 void DatabaseHandler::getAllDevices(std::vector<std::unique_ptr<Device> > &devices) const
 {
     QSqlQuery query;
-    if(query.exec("SELECT * FROM device"))
+    if(query.exec("SELECT productid, vendorid, serialnumber FROM device"))
     {
         while(query.next())
         {
             std::unique_ptr<Device> device =  std::make_unique<Device>();
-            device->serialNumber = query.value(0).toString();
-            device->productId = query.value(1).toString();
-            device->vendorId = query.value(2).toString();
+            device->productId = query.value(0).toString();
+            device->vendorId = query.value(1).toString();
+            device->serialNumber = query.value(2).toString();
             devices.push_back(std::move(device));
         }
     }
@@ -262,11 +275,11 @@ void DatabaseHandler::getAllDevices(std::vector<std::unique_ptr<Device> > &devic
     }
 }
 
-void DatabaseHandler::setDeviceBlacklisted(const QString &serialNumber) const
+void DatabaseHandler::setDeviceBlacklisted(const QString& productId, const QString& vendorId, const QString& serialNumber) const
 {
     try
     {
-        setDeviceStatus(serialNumber, DEVICE_STATUS_BLACKLISTED);
+        setDeviceStatus(productId, vendorId, serialNumber, DEVICE_STATUS_BLACKLISTED);
     }
     catch (std::exception& e)
     {
@@ -275,12 +288,12 @@ void DatabaseHandler::setDeviceBlacklisted(const QString &serialNumber) const
     }
 }
 
-bool DatabaseHandler::isDeviceBlackListed(const QString &serialNumber) const
+bool DatabaseHandler::isDeviceBlackListed(const QString& productId, const QString& vendorId, const QString& serialNumber) const
 {
     bool retVal = true; // Assume the worst
     try
     {
-        retVal = checkDeviceStatus(serialNumber, DEVICE_STATUS_BLACKLISTED);
+        retVal = checkDeviceStatus(productId, vendorId, serialNumber, DEVICE_STATUS_BLACKLISTED);
     }
     catch(std::exception& e)
     {
@@ -291,11 +304,11 @@ bool DatabaseHandler::isDeviceBlackListed(const QString &serialNumber) const
     return retVal;
 }
 
-void DatabaseHandler::setDeviceWhitelisted(const QString &serialNumber) const
+void DatabaseHandler::setDeviceWhitelisted(const QString& productId, const QString& vendorId, const QString& serialNumber) const
 {
     try
     {
-        setDeviceStatus(serialNumber, DEVICE_STATUS_WHITELISTED);
+        setDeviceStatus(productId, vendorId, serialNumber, DEVICE_STATUS_WHITELISTED);
     }
     catch (std::exception& e)
     {
@@ -304,12 +317,12 @@ void DatabaseHandler::setDeviceWhitelisted(const QString &serialNumber) const
     }
 }
 
-bool DatabaseHandler::isDeviceWhiteListed(const QString &serialNumber) const
+bool DatabaseHandler::isDeviceWhiteListed(const QString& productId, const QString& vendorId, const QString& serialNumber) const
 {
     bool retVal = false;
     try
     {
-        retVal = checkDeviceStatus(serialNumber, DEVICE_STATUS_WHITELISTED);
+        retVal = checkDeviceStatus(productId, vendorId, serialNumber, DEVICE_STATUS_WHITELISTED);
     }
     catch(std::exception& e)
     {
@@ -320,149 +333,70 @@ bool DatabaseHandler::isDeviceWhiteListed(const QString &serialNumber) const
     return retVal;
 }
 
-void DatabaseHandler::registerVendor(const QString &vendorId, const QString &vendorName)
+void DatabaseHandler::registerProductVendor(const QString &productId, const QString &productName, const QString &vendorId, const QString &vendorName)
 {
     QSqlQuery query;
-    query.prepare("INSERT INTO vendor(vendorid, vendorname)"
-                  "VALUES(?, ?)");
-    query.bindValue(0, vendorId);
-    query.bindValue(1, vendorName);
+    query.prepare("INSERT INTO productvendor(productid, vendorid, productname, vendorname)"
+                  "VALUES(?, ?, ?, ?)");
+    query.bindValue(0, productId);
+    query.bindValue(1, vendorId);
+    query.bindValue(2, productName);
+    query.bindValue(3, vendorName);
 
     if(!query.exec())
     {
-        qWarning() << __PRETTY_FUNCTION__ << "Failed to register vendor: " << query.lastError();
-        throw std::runtime_error("Failed to register vendor");
+        qCritical() << __PRETTY_FUNCTION__ << "Failed to register productvendor: " << query.lastError();
+        throw std::runtime_error("Failed to register productvendor");
     }
 }
 
-bool DatabaseHandler::getVendor(const QString &vendorId, Vendor &vendor) const
+bool DatabaseHandler::getProductVendor(ProductVendor& productVendor, const QString &productId, const QString vendorId)
 {
     bool success = false;
     QSqlQuery query;
-    query.prepare("SELECT * FROM vendor WHERE vendorid = ?");
-    query.bindValue(0, vendorId);
+    query.prepare("SELECT * FROM productvendor WHERE productid = ? AND vendorid = ?");
+    query.bindValue(0, productId);
+    query.bindValue(1, vendorId);
 
     if(query.exec())
     {
         if(query.next())
         {
-            vendor.vendorId = query.value(0).toString();
-            vendor.vendorName = query.value(1).toString();
+            productVendor.productId = query.value(0).toString();
+            productVendor.vendorId = query.value(1).toString();
+            productVendor.productName = query.value(2).toString();
+            productVendor.vendorName = query.value(3).toString();
             success = true;
         }
     }
     else
     {
-        qCritical() << __PRETTY_FUNCTION__ << "Failed to get vendor: " << query.lastError();
-        throw std::runtime_error("Failed to get vendor");
+        qCritical() << __PRETTY_FUNCTION__ << "Failed to get productvendor: " << query.lastError();
+        throw std::runtime_error("Failed to get productvendor");
     }
 
     return success;
 }
 
-void DatabaseHandler::getAllVendorKeys(QVector<QString> &vendorIds) const
-{
-    try
-    {
-        getKeysFromTable("vendorid", "vendor",  vendorIds);
-    }
-    catch(std::exception& e)
-    {
-        qCritical() <<  __PRETTY_FUNCTION__ << e.what();
-        throw e;
-    }
-}
-
-void DatabaseHandler::getAllVendors(std::vector<std::unique_ptr<Vendor> > vendors) const
+void DatabaseHandler::getAllProductVendors(std::vector<std::unique_ptr<ProductVendor> >& productVendors)
 {
     QSqlQuery query;
-    if(query.exec("SELECT * FROM vendor"))
+    if(query.exec("SELECT * FROM productvendor"))
     {
         while(query.next())
         {
-            std::unique_ptr<Vendor> vendor =  std::make_unique<Vendor>();
-            vendor->vendorId = query.value(0).toString();
-            vendor->vendorName = query.value(1).toString();
-            vendors.push_back(std::move(vendor));
+            std::unique_ptr<ProductVendor> productVendor =  std::make_unique<ProductVendor>();
+            productVendor->productId = query.value(0).toString();
+            productVendor->vendorId = query.value(1).toString();
+            productVendor->productName = query.value(2).toString();
+            productVendor->vendorName = query.value(3).toString();
+            productVendors.push_back(std::move(productVendor));
         }
     }
     else
     {
-        qCritical() << __PRETTY_FUNCTION__ << "Failed to get all vendors: " << query.lastError();
-        throw std::runtime_error("Failed to get all vendors");
-    }
-}
-
-void DatabaseHandler::registerProduct(const QString &productId, const QString &productName)
-{
-    QSqlQuery query;
-    query.prepare("INSERT INTO product(productid, productname)"
-                  "VALUES(?, ?)");
-    query.bindValue(0, productId);
-    query.bindValue(1, productName);
-
-    if(!query.exec())
-    {
-        qWarning() << __PRETTY_FUNCTION__ << "Failed to register product: " << query.lastError();
-        throw std::runtime_error("Failed to register product");
-    }
-}
-
-bool DatabaseHandler::getProduct(const QString &productId, Product &product) const
-{
-    bool success = false;
-    QSqlQuery query;
-    query.prepare("SELECT * FROM product WHERE productid = ?");
-    query.bindValue(0, productId);
-
-    if(query.exec())
-    {
-        if(query.next())
-        {
-            product.productId = query.value(0).toString();
-            product.productName = query.value(1).toString();
-            success = true;
-        }
-    }
-    else
-    {
-        qCritical() << __PRETTY_FUNCTION__ << "Failed to get product: " << query.lastError();
-        throw std::runtime_error("Failed to get product");
-    }
-
-    return success;
-}
-
-void DatabaseHandler::getAllProductKeys(QVector<QString> &productIds) const
-{
-    try
-    {
-        getKeysFromTable("productid", "product",  productIds);
-    }
-    catch(std::exception& e)
-    {
-        qCritical() <<  __PRETTY_FUNCTION__ << e.what();
-        throw e;
-    }
-}
-
-void DatabaseHandler::getAllProducts(std::vector<std::unique_ptr<Product> > products) const
-{
-    QSqlQuery query;
-    if(query.exec("SELECT * FROM product"))
-    {
-        while(query.next())
-        {
-            std::unique_ptr<Product> product =  std::make_unique<Product>();
-            product->productId = query.value(0).toString();
-            product->productName = query.value(1).toString();
-            products.push_back(std::move(product));
-        }
-    }
-    else
-    {
-        qCritical() << __PRETTY_FUNCTION__ << "Failed to get all products: " << query.lastError();
-        throw std::runtime_error("Failed to get all products");
+        qCritical() << __PRETTY_FUNCTION__ << "Failed to get all productvendors: " << query.lastError();
+        throw std::runtime_error("Failed to get all productvendors");
     }
 }
 
@@ -481,7 +415,7 @@ void DatabaseHandler::registerVirusHash(const QString &virusHash, const QString 
     }
 }
 
-bool DatabaseHandler::getVirusHash(const QString &virusHash, VirusHash &vHash) const
+bool DatabaseHandler::getVirusHash(VirusHash &vHash, const QString &virusHash) const
 {
     bool success = false;
     QSqlQuery query;
@@ -539,7 +473,7 @@ void DatabaseHandler::getAllVirusHashes(std::vector<std::unique_ptr<VirusHash> >
     }
 }
 
-bool DatabaseHandler::isVirusHashInDatabase(const QString &hash) const
+bool DatabaseHandler::isHashInVirusDatabase(const QString &hash) const
 {
     bool found = true; // Assume the worst
     QSqlQuery query;
@@ -562,15 +496,19 @@ bool DatabaseHandler::isVirusHashInDatabase(const QString &hash) const
     return found;
 }
 
-void DatabaseHandler::logEvent(const QString &edgeNodeMacAddress, const QString &deviceSerialNumber, const QString &timestamp, const QString &eventDescription)
+void DatabaseHandler::logEvent(const QString& edgeNodeMacAddress, const QString& deviceProductId, const QString& deviceVendorId, const QString& timestamp, const QString& eventDescription, const QString& deviceSerialNumber)
 {
     QSqlQuery query;
-    query.prepare("INSERT INTO log(edgenodemacaddress, deviceid, logtime, loginfo)"
-                  "VALUES(?, ?, ?, ?, ?");
+    query.prepare("INSERT INTO log(edgenodemacaddress, deviceid, logtime, loginfo) "
+                  "SELECT ?, device.id, ?, ? "
+                  "FROM device "
+                  "WHERE device.productid = ? AND device.vendorid = ? AND device.serialnumber = ?");
     query.bindValue(0, edgeNodeMacAddress);
-    query.bindValue(1, deviceSerialNumber);
-    query.bindValue(2, timestamp);
-    query.bindValue(3, eventDescription);
+    query.bindValue(1, timestamp);
+    query.bindValue(2, eventDescription);
+    query.bindValue(3, deviceProductId);
+    query.bindValue(4, deviceVendorId);
+    query.bindValue(5, deviceSerialNumber);
 
     if(!query.exec())
     {
@@ -579,23 +517,34 @@ void DatabaseHandler::logEvent(const QString &edgeNodeMacAddress, const QString 
     }
 }
 
-bool DatabaseHandler::getLoggedEvent(const QString &edgeNodeMacAddress, const QString deviceSerialNumber, const QString &timestamp, LogEvent& logEvent) const
+bool DatabaseHandler::getLoggedEvent(LogEvent& logEvent, const QString& edgeNodeMacAddress, const QString& deviceProductId, const QString& deviceVendorId, const QString& timestamp, const QString& deviceSerialNumber) const
 {
     bool success = false;
     QSqlQuery query;
-    query.prepare("SELECT * FROM log WHERE edgenodemacaddress = ? AND deviceid = ? AND logtime = ?");
+    query.prepare("SELECT edgenodemacaddress, productid, vendorid, serialnumber, logtime, loginfo "
+                  "FROM log "
+                  "INNER JOIN device ON device.id = log.deviceid "
+                  "WHERE edgenodemacaddress = ? "
+                    "AND deviceid = (SELECT id "
+                                    "FROM device "
+                                    "WHERE productid = ? AND vendorid = ? AND serialnumber = ?) "
+                    "AND logtime = ? ");
     query.bindValue(0, edgeNodeMacAddress);
-    query.bindValue(1, deviceSerialNumber);
-    query.bindValue(2, timestamp);
+    query.bindValue(1, deviceProductId);
+    query.bindValue(2, deviceVendorId);
+    query.bindValue(3, deviceSerialNumber);
+    query.bindValue(4, timestamp);
 
     if(query.exec())
     {
         if(query.next())
         {
             logEvent.edgeNodeMacAddress = query.value(0).toString();
-            logEvent.deviceSerialNumber = query.value(1).toString();
-            logEvent.timestamp = query.value(2).toString();
-            logEvent.eventDescription = query.value(3).toString();
+            logEvent.deviceProductId = query.value(1).toString();
+            logEvent.deviceVendorId = query.value(2).toString();
+            logEvent.deviceSerialNumber = query.value(3).toString();
+            logEvent.timestamp = query.value(4).toString();
+            logEvent.eventDescription = query.value(5).toString();
             success = true;
         }
     }
@@ -608,18 +557,22 @@ bool DatabaseHandler::getLoggedEvent(const QString &edgeNodeMacAddress, const QS
     return success;
 }
 
-void DatabaseHandler::getAllLoggedEvents(std::vector<std::unique_ptr<LogEvent> > loggedEvents) const
+void DatabaseHandler::getAllLoggedEvents(std::vector<std::unique_ptr<LogEvent> >& loggedEvents) const
 {
     QSqlQuery query;
-    if(query.exec("SELECT * FROM log"))
+    if(query.exec("SELECT edgenodemacaddress, productid, vendorid, serialnumber, logtime, loginfo "
+                  "FROM log "
+                  "INNER JOIN device ON device.id = log.deviceid"))
     {
         while(query.next())
         {
             std::unique_ptr<LogEvent> logEvent =  std::make_unique<LogEvent>();
             logEvent->edgeNodeMacAddress = query.value(0).toString();
-            logEvent->deviceSerialNumber = query.value(1).toString();
-            logEvent->timestamp = query.value(2).toString();
-            logEvent->eventDescription = query.value(3).toString();
+            logEvent->deviceProductId = query.value(1).toString();
+            logEvent->deviceVendorId = query.value(2).toString();
+            logEvent->deviceSerialNumber = query.value(3).toString();
+            logEvent->timestamp = query.value(4).toString();
+            logEvent->eventDescription = query.value(5).toString();
             loggedEvents.push_back(std::move(logEvent));
         }
     }
@@ -648,12 +601,14 @@ void DatabaseHandler::getKeysFromTable(const QString keyName, const QString &tab
     }
 }
 
-void DatabaseHandler::setDeviceStatus(const QString &serialNumber, const QString &status) const
+void DatabaseHandler::setDeviceStatus(const QString& productId, const QString& vendorId, const QString& serialNumber, const QString& status) const
 {
     QSqlQuery query;
-    query.prepare("UPDATE device SET status = ? WHERE serialnumber = ?");
+    query.prepare("UPDATE device SET status = ? WHERE productid = ? AND vendorid = ? AND serialnumber = ?");
     query.bindValue(0, status);
-    query.bindValue(1, serialNumber);
+    query.bindValue(1, productId);
+    query.bindValue(2, vendorId);
+    query.bindValue(3, serialNumber);
 
     if(!query.exec())
     {
@@ -661,13 +616,15 @@ void DatabaseHandler::setDeviceStatus(const QString &serialNumber, const QString
     }
 }
 
-bool DatabaseHandler::checkDeviceStatus(const QString& serialNumber, const QString &status) const
+bool DatabaseHandler::checkDeviceStatus(const QString& productId, const QString& vendorId, const QString& serialNumber, const QString& status) const
 {
     bool retVal = false;
     QSqlQuery query;
-    query.prepare("SELECT * FROM device WHERE serialnumber = ? AND status = ?");
-    query.bindValue(0, serialNumber);
-    query.bindValue(1, status);
+    query.prepare("SELECT * FROM device WHERE productId = ? AND vendorid = ? AND serialnumber = ? AND status = ?");
+    query.bindValue(0, productId);
+    query.bindValue(1, vendorId);
+    query.bindValue(2, serialNumber);
+    query.bindValue(3, status);
 
     if(query.exec())
     {

@@ -21,7 +21,7 @@ public:
         QString lastHeartbeat = "";
     };
     void registerEdgeNode(const QString& macAddress, bool isOnline, const QString& lastHeartbeatTimestamp) const;
-    bool getEdgeNode(const QString& macAddress, EdgeNode& edgeNode) const;
+    bool getEdgeNode(EdgeNode& edgeNode, const QString& macAddress) const;
     void getAllEdgeNodeKeys(QVector<QString>& macAddresses) const;
     void getAllEdgeNodes(std::vector<std::unique_ptr<EdgeNode>>& edgeNodes) const;
     void setEdgeNodeOnlineStatus(const QString& macAddress, bool isOnline, const QString& lastHeartbeatTimestamp = "");
@@ -30,40 +30,29 @@ public:
     //Device
     struct Device
     {
-        QString serialNumber = "";
         QString vendorId = "";
         QString productId = "";
+        QString serialNumber = "";
     };
-    void registerDevice(const QString& serialNumber, const QString& vendorId, const QString& productId) const;
-    bool getDevice(const QString& serialNumber, Device& device) const;
-    void getAllDeviceKeys(QVector<QString>& serialNumbers) const;
+    void registerDevice(const QString& productId, const QString& vendorId, const QString& serialNumber = "") const;
+    bool getDevice(Device& device, const QString& productId, const QString& vendorId, const QString& serialNumber = "") const;
     void getAllDevices(std::vector<std::unique_ptr<Device>>& devices) const;
-    void setDeviceBlacklisted(const QString& serialNumber) const;
-    bool isDeviceBlackListed(const QString& serialNumber) const;
-    void setDeviceWhitelisted(const QString& serialNumber) const;
-    bool isDeviceWhiteListed(const QString& serialNumber) const;
+    void setDeviceBlacklisted(const QString& productId, const QString& vendorId, const QString& serialNumber = "") const;
+    bool isDeviceBlackListed(const QString& productId, const QString& vendorId, const QString& serialNumber = "") const;
+    void setDeviceWhitelisted(const QString& productId, const QString& vendorId, const QString& serialNumber = "") const;
+    bool isDeviceWhiteListed(const QString& productId, const QString& vendorId, const QString& serialNumber = "") const;
 
-    // Vendor
-    struct Vendor
-    {
-        QString vendorId = "";
-        QString vendorName = "";
-    };
-    void registerVendor(const QString& vendorId, const QString& vendorName);
-    bool getVendor(const QString& vendorId, Vendor& vendor) const;
-    void getAllVendorKeys(QVector<QString>& vendorIds) const;
-    void getAllVendors(std::vector<std::unique_ptr<Vendor>> vendors) const;
-
-    //Product
-    struct Product
+    // ProductVendor
+    struct ProductVendor
     {
         QString productId = "";
         QString productName = "";
+        QString vendorId = "";
+        QString vendorName = "";
     };
-    void registerProduct(const QString& productId, const QString& productName);
-    bool getProduct(const QString& productId, Product& product) const;
-    void getAllProductKeys(QVector<QString>& productIds) const;
-    void getAllProducts(std::vector<std::unique_ptr<Product>> products) const;
+    void registerProductVendor(const QString& productId, const QString& productName, const QString& vendorId, const QString& vendorName);
+    bool getProductVendor(ProductVendor& productVendor, const QString& productId, const QString vendorId);
+    void getAllProductVendors(std::vector<std::unique_ptr<ProductVendor>>& productVendors);
 
     // Virus
     struct VirusHash
@@ -72,27 +61,29 @@ public:
         QString description = "";
     };
     void registerVirusHash(const QString& virusHash, const QString& description);
-    bool getVirusHash(const QString& virusHash, VirusHash& vHash) const;
+    bool getVirusHash(VirusHash& vHash, const QString& virusHash) const;
     void getAllVirusHashKeys(QVector<QString>& virusHashes) const;
     void getAllVirusHashes(std::vector<std::unique_ptr<VirusHash>>& virusHashes) const ;
-    bool isVirusHashInDatabase(const QString& hash) const;
+    bool isHashInVirusDatabase(const QString& hash) const;
 
     // Event logging
     struct LogEvent
     {
         QString edgeNodeMacAddress = "";
+        QString deviceProductId = "";
+        QString deviceVendorId = "";
         QString deviceSerialNumber = "";
         QString timestamp = "";
         QString eventDescription = "";
     };
-    void logEvent(const QString& edgeNodeMacAddress, const QString& deviceSerialNumber, const QString& timestamp, const QString& eventDescription);
-    bool getLoggedEvent(const QString& edgeNodeMacAddress, const QString deviceSerialNumber, const QString& timestamp, LogEvent& logEvent) const;
-    void getAllLoggedEvents(std::vector<std::unique_ptr<LogEvent>> loggedEvents) const;
+    void logEvent(const QString& edgeNodeMacAddress, const QString& deviceProductId, const QString& deviceVendorId, const QString& timestamp, const QString& eventDescription, const QString& deviceSerialNumber = "");
+    bool getLoggedEvent(LogEvent& logEvent, const QString& edgeNodeMacAddress, const QString& deviceProductId, const QString& deviceVendorId, const QString& timestamp, const QString& deviceSerialNumber = "") const;
+    void getAllLoggedEvents(std::vector<std::unique_ptr<LogEvent>>& loggedEvents) const;
 
 private:
     void getKeysFromTable(const QString keyName, const QString& tableName, QVector<QString>& result) const;
-    void setDeviceStatus(const QString& serialNumber, const QString& status) const;
-    bool checkDeviceStatus(const QString& serialNumber, const QString& status) const;
+    void setDeviceStatus(const QString& productId, const QString& vendorId, const QString& serialNumber, const QString& status) const;
+    bool checkDeviceStatus(const QString& productId, const QString& vendorId, const QString& serialNumber, const QString& status) const;
 };
 
 #endif // DATABASEHANDLER_H
