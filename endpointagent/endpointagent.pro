@@ -1,7 +1,7 @@
 QT -= gui
 QT += dbus network mqtt
 
-CONFIG += c++17 console
+CONFIG += c++17
 CONFIG -= app_bundle
 
 #DBUS_ADAPTORS += DBusInterface.xml

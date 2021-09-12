@@ -8,11 +8,23 @@
 
 #include "servicehandler.h"
 #include "uplinkhandler.h"
+#include "EdgeHandler.h"
+
 
 
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
+
+    /* Configure broker (server) */
+    QString broker_addr = "test.mosquitto.org";
+    quint16 broker_port = 1883;
+
+    /* Initialize a unique pointer to EdgeHandler */
+    QScopedPointer<MessageHandler::Gateway::EdgeHandler> edge_handler = QScopedPointer<MessageHandler::Gateway::EdgeHandler>(
+        new MessageHandler::Gateway::EdgeHandler(broker_addr, broker_port)
+    );
+
 
     ServiceHandler sh;
     //sh.listDevices("allow");
@@ -24,6 +36,9 @@ int main(int argc, char *argv[])
             &uh, &UplinkHandler::devicePresenceUpload);
     QObject::connect(&sh, &ServiceHandler::devicePolicyUpdate,
             &uh, &UplinkHandler::devicePolicyUpload);
+
+    QObject::connect(&uh, &UplinkHandler::updateEdgeHandler,
+            edge_handler.get(),&MessageHandler::Gateway::EdgeHandler::newDevicePresence);
 
     //std::cout << uh.getMacAddress().toStdString();
 

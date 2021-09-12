@@ -16,6 +16,7 @@ namespace MessageHandler::Gateway
     public slots:
         void new_message(QMqttMessage) override;
         void heartbeat_received();
+        void newDevicePresence(QString lala);
         //void on_get_edges();
     };
 }

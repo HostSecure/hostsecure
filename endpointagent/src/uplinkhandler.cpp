@@ -32,6 +32,7 @@ void UplinkHandler::devicePresenceUpload(QString device_id, QString device_seria
                 "\nEvent code " << event <<
                 "\nTarget code " << target <<
                 "\nEdge node " << m_hardwareAddress << "\n";
+    emit updateEdgeHandler(device_id, device_serial, target, event, interface, m_hardwareAddress);
 
 }
 void UplinkHandler::devicePolicyUpload(QString device_id, QString device_serial, uint target, QString interface)
@@ -41,7 +42,9 @@ void UplinkHandler::devicePolicyUpload(QString device_id, QString device_serial,
                 "\nDevice Serial " << device_serial <<
                 "\nWith-Interface " << interface <<
                 "\nTarget code " << target <<
+                "\nEvent code " << "0" <<
                 "\nEdge node " << m_hardwareAddress << "\n" ;
+    emit updateEdgeHandler(device_id, device_serial, target, 0, interface, m_hardwareAddress);
 
 }
 

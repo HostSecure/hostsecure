@@ -28,6 +28,19 @@ void MessageHandler::Gateway::EdgeHandler::heartbeat_received()
 
 }
 
+void MessageHandler::Gateway::EdgeHandler::newDevicePresence(QString lala)
+{
+    QJsonObject payload;
+    payload["MACAddress"] = lala;
+    payload["IsOnline"] = true;
+    payload["LastHeartbeat"] = QDateTime::currentDateTime().toString();
+    payload["heisira"] = lala;
+
+    QString topic = "/edges/new_edge_device_update";
+    this->publish(topic, payload);
+
+}
+
 void MessageHandler::Gateway::EdgeHandler::new_message(QMqttMessage _payload)
 {
     /* Forward payload to virtual method of base class */

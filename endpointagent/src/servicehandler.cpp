@@ -3,6 +3,8 @@
 #include <QtDBus/QDBusConnection>
 #include <QtDBus/QDBusArgument>
 #include <QDBusMetaType>
+#include <sstream>
+#include <string>
 
 ServiceHandler::ServiceHandler(QObject *parent) : QObject(parent)
 {
@@ -36,6 +38,9 @@ ServiceHandler::ServiceHandler(QObject *parent) : QObject(parent)
         qPrintable(QDBusConnection::systemBus().lastError().message());
     }
 
+    listDevices("allow");
+    listDevices("block");
+
 }
 
 void ServiceHandler::listRules(QString label)
@@ -62,7 +67,9 @@ void ServiceHandler::removeRule(uint id)
 void ServiceHandler::listDevices(QString query)
 {
     QDBusMessage devices = m_ifaceUSBGuardDevices->call("listDevices",query);
-    qDebug() << devices; //a(us)
+ //   qDebug() << devices.arguments().at(0)[0]; //a(us)
+   // for( auto e : devices.arguments())
+
 
 }
 

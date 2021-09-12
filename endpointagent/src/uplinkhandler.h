@@ -23,6 +23,7 @@ private:
 
 
 signals:
+    void updateEdgeHandler(QString device_id, QString device_serial, uint target, uint event, QString interface, QString machine_address);
 
 public slots:
 
