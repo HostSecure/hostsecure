@@ -28,13 +28,18 @@ void MessageHandler::Gateway::EdgeHandler::heartbeat_received()
 
 }
 
-void MessageHandler::Gateway::EdgeHandler::newDevicePresence(QString lala)
+void MessageHandler::Gateway::EdgeHandler::newDevicePresence(QString device_id, QString device_serial, uint target, uint event,
+                                                             QString interface, QString m_hardwareAddress)
 {
     QJsonObject payload;
-    payload["MACAddress"] = lala;
+    payload["MACAddress"] = m_hardwareAddress;
     payload["IsOnline"] = true;
     payload["LastHeartbeat"] = QDateTime::currentDateTime().toString();
-    payload["heisira"] = lala;
+    payload["device_id"] = device_id;
+    payload["device_serial"] = device_serial;
+    payload["target"] = qint64(target);
+    payload["event"] = qint64(event);
+    payload["interface"] = interface;
 
     QString topic = "/edges/new_edge_device_update";
     this->publish(topic, payload);

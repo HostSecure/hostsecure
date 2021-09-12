@@ -16,8 +16,9 @@ namespace MessageHandler::Gateway
     public slots:
         void new_message(QMqttMessage) override;
         void heartbeat_received();
-        void newDevicePresence(QString lala);
-        //void on_get_edges();
+        void newDevicePresence(QString device_id, QString device_serial, uint target, uint event,
+                               QString interface, QString m_hardwareAddress);
+//void on_get_edges();
     };
 }
 
