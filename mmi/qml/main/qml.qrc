@@ -7,5 +7,6 @@
         <file>HomeView.qml</file>
         <file>DeviceView.qml</file>
         <file>EdgeView.qml</file>
+        <file>MqttStatus.qml</file>
     </qresource>
 </RCC>

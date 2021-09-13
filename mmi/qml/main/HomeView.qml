@@ -3,7 +3,8 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Common
 
-TransparentPane {
+Pane {
+   background: null
 
    TransparentPane {
       radius: 20

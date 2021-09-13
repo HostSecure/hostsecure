@@ -14,7 +14,7 @@ Item {
       TransparentPane {
          padding: 0
          Material.elevation: 3
-         Material.background: Colors.setupBackgroundColor
+         Material.background: Colors.paneBackgroundColor
          Layout.fillHeight: true
          z: 10
 
@@ -22,9 +22,9 @@ Item {
             id: setupBar
             currentIndex: 0
             model: [
-               { title: "Home",    iconName: "home" },
-               { title: "Edges",   iconName: "computer" },
-               { title: "Devices", iconName: "memory-stick" },
+               { title: "Home",   iconName: "home" },
+               { title: "Edges",  iconName: "computer" },
+               { title: "Status", iconName: "" },
             ]
             delegate: TabButton {
                width: 100
@@ -33,7 +33,7 @@ Item {
                icon.name: modelData.iconName
                text: modelData.title
                display: AbstractButton.TextUnderIcon
-               down: setupBar.currentIndex == index
+               down: setupBar.currentIndex === index
                font.capitalization: Font.MixedCase
                font.pixelSize: 20
                onToggled: setupBar.currentIndex = index
@@ -41,15 +41,18 @@ Item {
          }
       }
 
-
-      StackLayout {
-         currentIndex: setupBar.currentIndex
+      Rectangle {
+         color: Colors.paneBackgroundColor
          Layout.fillHeight: true
          Layout.fillWidth: true
 
-         HomeView { }
-         EdgeView { }
-         DeviceView { }
+         StackLayout {
+            anchors.fill: parent
+            currentIndex: setupBar.currentIndex
+            HomeView { }
+            EdgeView { }
+            MqttStatus { }
+         }
       }
    }
 }

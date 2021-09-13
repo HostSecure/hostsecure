@@ -3,20 +3,21 @@ QT += mqtt
 TARGET = messagehandler
 
 TEMPLATE = lib
-CONFIG += staticlib c++2a
+CONFIG += staticlib c++17
 
 INCLUDEPATH += include
 
 SOURCES += \
-    src/mqttclientbase.cpp \
-    src/msg/msgedge.cpp \
-    src/msg/msgdevice.cpp
+    src/MqttInterface.cpp \
+    src/DatabaseHandler.cpp \
+    src/EdgeHandler.cpp \
+    src/MmiHandler.cpp \
 
 HEADERS += \
-    include/mqttclientbase.h \
-    include/msg/msgbase.h \
-    include/msg/msgedge.h \
-    include/msg/msgdevice.h
+    include/MqttInterface.h \
+    include/DatabaseHandler.h \
+    include/EdgeHandler.h \
+    include/MmiHandler.h
 
 # Default rules for deployment.
 unix {

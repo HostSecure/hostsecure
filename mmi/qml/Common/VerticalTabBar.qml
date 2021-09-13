@@ -24,6 +24,7 @@ ListView {
          width: 5
          height: parent.height
          color: Material.accentColor
+         Behavior on height { NumberAnimation { duration: 100 } }
       }
    }
 }

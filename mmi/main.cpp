@@ -3,11 +3,7 @@
 #include <QQmlContext>
 #include <QIcon>
 #include "hostsecurecollection.h"
-
-/* MessageHandler */
-#include "MqttInterface.h"
-#include "EdgeHandler.h"
-#include "DatabaseHandler.h"
+#include "devicemodel.h"
 
 namespace
 {
@@ -16,6 +12,8 @@ namespace
 
 int main( int argc, char *argv[] )
 {
+   qputenv("QML_DISABLE_DISK_CACHE", "1");
+
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
@@ -42,15 +40,6 @@ int main( int argc, char *argv[] )
    }, Qt::QueuedConnection );
    engine.load( url );
 
-   /* Configure broker (server) */
-   QString broker_addr = "127.0.0.1";
-   quint16 broker_port = 1883;
-
-   /* Initialize a unique pointer to DatabaseHandler */
-   QScopedPointer<MessageHandler::Gateway::DatabaseHandler> database_handler = QScopedPointer<MessageHandler::Gateway::DatabaseHandler>(
-       new MessageHandler::Gateway::DatabaseHandler(broker_addr, broker_port)
-   );
-
    return app.exec();
 }
 
@@ -60,9 +49,10 @@ namespace
    {
       constexpr auto msg = "Cannot create from QML..";
       constexpr auto uri = "HostSecure";
-      qmlRegisterUncreatableType< HostSecureCollection >( "HostSecure", 1, 0, "HostSecureCollection", msg );
+      qmlRegisterUncreatableType< HostSecureCollection >( "HostSecure", 1, 0, "HostSecureCollection", msg );      
+      qmlRegisterUncreatableType< MmiMqttClient        >( uri, 1, 0, "MmiMqttClient", msg );
       qmlRegisterUncreatableType< EdgeModel            >( uri, 1, 0, "EdgeModel", msg );
-      qmlRegisterUncreatableType< UsbDeviceModel       >( uri, 1, 0, "UsbDeviceModel", msg );
+      qmlRegisterUncreatableType< DeviceModel          >( uri, 1, 0, "DeviceModel", msg );
    }
 }
 

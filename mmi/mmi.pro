@@ -1,10 +1,6 @@
 QT += quick mqtt
 
-CONFIG += c++17
-
-# You can make your code fail to compile if it uses deprecated APIs.
-# In order to do so, uncomment the following line.
-#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
+CONFIG += c++2a
 
 INCLUDEPATH += src
 
@@ -14,22 +10,18 @@ LIBS += -L../messagehandler/lib -lmessagehandler
 
 SOURCES += \
     main.cpp \
-    src/datastore.cpp \
     src/hostsecurecollection.cpp \
-    # Models
     src/edgemodel.cpp \
-    src/usbdevicemodel.cpp \
-    # Common
-    src/commonutils.cpp
+    src/devicemodel.cpp \
+    src/commonutils.cpp \
+    src/mmimqttclient.cpp
 
 HEADERS += \
-    src/datastore.h \
     src/hostsecurecollection.h \
-    # Models
     src/edgemodel.h \
-    src/usbdevicemodel.h \
-    # Common
-    src/commonutils.h
+    src/devicemodel.h \
+    src/commonutils.h \
+    src/mmimqttclient.h
 
 RESOURCES += \
     qml/main/qml.qrc \
