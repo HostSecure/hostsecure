@@ -13,6 +13,7 @@ public:
     void testVirus();
     void testCaseProductVendor();
     void testCaseDevice(bool requiredDataExists = false);
+    void testCaseConnectedDevice(bool requiredDataExists = false);
     void testCaseLog(bool requiredDataExists = false);
     void testCaseAll();
 

@@ -73,17 +73,25 @@ DatabaseHandler::DatabaseHandler(const QString& databasePath)
                 qFatal("Failed to create virushash table: %s", query.lastError().text().toStdString().c_str());
             }
 
-            if(!query.exec("CREATE TABLE productvendor(productid VARCHAR(4), vendorid VARCHAR(4), productname VARCHAR(30), vendorname VARCHAR(30),"
+            if(!query.exec("CREATE TABLE productvendor(productid VARCHAR(4), vendorid VARCHAR(4), productname VARCHAR(30), vendorname VARCHAR(30), "
                                                       "PRIMARY KEY(productid, vendorid))"))
             {
                 qFatal("Failed to create productvendor table: %s", query.lastError().text().toStdString().c_str());
             }
 
             if(!query.exec("CREATE TABLE device(id INTEGER PRIMARY KEY AUTOINCREMENT, productid VARCHAR(4), vendorid VARCHAR(4), serialnumber VARCHAR(8), status CHAR(1) NOT NULL, "
-                       "UNIQUE(productid, vendorid, serialnumber),"
+                       "UNIQUE(productid, vendorid, serialnumber), "
                        "FOREIGN KEY(productid, vendorid) REFERENCES productvendor(productid, vendorid))"))
             {
                 qFatal("Failed to create device table: %s", query.lastError().text().toStdString().c_str());
+            }
+
+            if(!query.exec("CREATE TABLE connecteddevice(edgenodemacaddress VARCHAR(8), deviceid INTEGER, connecttime TIMESTAMP, "
+                           "FOREIGN KEY (edgenodemacaddress) REFERENCES edgenode(macaddress), "
+                           "FOREIGN KEY (deviceid) REFERENCES device(id), "
+                           "PRIMARY KEY(edgenodemacaddress, deviceid))"))
+            {
+                qFatal("Failed to create connecteddevice table: %s", query.lastError().text().toStdString().c_str());
             }
 
             if(!query.exec("CREATE TABLE log(edgenodemacaddress VARCHAR(8), "
@@ -345,6 +353,72 @@ bool DatabaseHandler::isDeviceWhiteListed(const QString& productId, const QStrin
     return retVal;
 }
 
+void DatabaseHandler::registerConnectedDevice(const QString &edgeNodeMacAddress, const QString &deviceProductId, const QString &deviceVendorId, const QString &deviceSerialNumber, const QString &timestamp)
+{
+    QSqlQuery query;
+    query.prepare("INSERT INTO connecteddevice(edgenodemacaddress, deviceid, connecttime) "
+                  "SELECT ?, device.id, ? "
+                  "FROM device "
+                  "WHERE device.productid = ? AND device.vendorid = ? AND device.serialnumber = ?");
+    query.bindValue(0, edgeNodeMacAddress);
+    query.bindValue(1, timestamp);
+    query.bindValue(2, deviceProductId);
+    query.bindValue(3, deviceVendorId);
+    query.bindValue(4, deviceSerialNumber);
+
+//    "INSERT INTO log(edgenodemacaddress, deviceid, logtime, loginfo) "
+//                      "SELECT ?, device.id, ?, ? "
+//                      "FROM device "
+//                      "WHERE device.productid = ? AND device.vendorid = ? AND device.serialnumber = ?"
+
+    if(!query.exec())
+    {
+        qCritical() << __PRETTY_FUNCTION__ << "Failed to register connected device: " << query.lastError();
+        throw std::runtime_error("Failed to register connected device");
+    }
+}
+
+void DatabaseHandler::unregisterConnectedDevice(const QString &edgeNodeMacAddress, const QString &deviceProductId, const QString &deviceVendorId, const QString &deviceSerialNumber)
+{
+    QSqlQuery query;
+    query.prepare("DELETE FROM connecteddevice "
+                  "WHERE edgenodemacaddress = ? AND deviceid = (SELECT id FROM device WHERE productid = ? AND vendorid = ? AND serialnumber = ?)");
+    query.bindValue(0, edgeNodeMacAddress);
+    query.bindValue(1, deviceProductId);
+    query.bindValue(2, deviceVendorId);
+    query.bindValue(3, deviceSerialNumber);
+
+    if(!query.exec())
+    {
+        qCritical() << __PRETTY_FUNCTION__ << "Failed to unregister connected device: " << query.lastError();
+        throw std::runtime_error("Failed to unregister connected device");
+    }
+}
+
+void DatabaseHandler::getAllConnectedDevices(std::vector<std::unique_ptr<ConnectedDevice> > &connectedDevices)
+{
+    QSqlQuery query;
+    if(query.exec("SELECT edgenodemacaddress, productid, vendorid, serialnumber "
+                  "FROM connecteddevice "
+                  "INNER JOIN device ON device.id = connecteddevice.deviceid"))
+    {
+        while(query.next())
+        {
+            std::unique_ptr<ConnectedDevice> connectedDevice =  std::make_unique<ConnectedDevice>();
+            connectedDevice->connectedEdgeNodeMacAddress = query.value(0).toString();
+            connectedDevice->deviceProductId = query.value(1).toString();
+            connectedDevice->deviceVendorId = query.value(2).toString();
+            connectedDevice->deviceSerialNumber = query.value(3).toString();
+            connectedDevices.push_back(std::move(connectedDevice));
+        }
+    }
+    else
+    {
+        qCritical() << __PRETTY_FUNCTION__ << "Failed to get all connected devices: " << query.lastError();
+        throw std::runtime_error("Failed to get all connected devices");
+    }
+}
+
 void DatabaseHandler::registerProductVendor(const QString &productId, const QString &productName, const QString &vendorId, const QString &vendorName)
 {
     QSqlQuery query;
@@ -508,7 +582,7 @@ bool DatabaseHandler::isHashInVirusDatabase(const QString &hash) const
     return found;
 }
 
-void DatabaseHandler::logEvent(const QString& edgeNodeMacAddress, const QString& deviceProductId, const QString& deviceVendorId, const QString& timestamp, const QString& eventDescription, const QString& deviceSerialNumber)
+void DatabaseHandler::logEvent(const QString& edgeNodeMacAddress, const QString& deviceProductId, const QString& deviceVendorId, const QString& deviceSerialNumber, const QString& timestamp, const QString& eventDescription)
 {
     QSqlQuery query;
     query.prepare("INSERT INTO log(edgenodemacaddress, deviceid, logtime, loginfo) "
@@ -529,7 +603,7 @@ void DatabaseHandler::logEvent(const QString& edgeNodeMacAddress, const QString&
     }
 }
 
-bool DatabaseHandler::getLoggedEvent(LogEvent& logEvent, const QString& edgeNodeMacAddress, const QString& deviceProductId, const QString& deviceVendorId, const QString& timestamp, const QString& deviceSerialNumber) const
+bool DatabaseHandler::getLoggedEvent(LogEvent& logEvent, const QString& edgeNodeMacAddress, const QString& deviceProductId, const QString& deviceVendorId, const QString& deviceSerialNumber, const QString& timestamp) const
 {
     bool success = false;
     QSqlQuery query;

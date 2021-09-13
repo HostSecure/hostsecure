@@ -155,13 +155,12 @@ void TestHandler::testCaseDevice(bool requiredDataExists)
         m_DBHandler->getAllProductVendors(productVendors);
         Q_ASSERT(productVendors.size() == 3);
 
-        for(uint i = 0; i < productVendors.size() - 1; ++i)
+        for(uint i = 0; i < productVendors.size(); ++i)
         {
             m_DBHandler->registerDevice(productVendors[i]->productId, productVendors[i]->vendorId, QString::number(i + 1000));
         }
 
         m_DBHandler->registerDevice(productVendors[0]->productId, productVendors[0]->vendorId, QString::number(1000)); //Should be ignored
-        m_DBHandler->registerDevice(productVendors[0]->productId, productVendors[0]->vendorId); // Test device without a serial number
 
         // Test device with serial number
         DatabaseHandler::Device device;
@@ -169,13 +168,6 @@ void TestHandler::testCaseDevice(bool requiredDataExists)
         Q_ASSERT(device.productId == productVendors[0]->productId);
         Q_ASSERT(device.vendorId == productVendors[0]->vendorId);
         Q_ASSERT(device.serialNumber == QString::number(1000));
-
-        // Test device without serial number
-        DatabaseHandler::Device device2;
-        Q_ASSERT(m_DBHandler->getDevice(device2, productVendors[0]->productId, productVendors[0]->vendorId));
-        Q_ASSERT(device2.productId == productVendors[0]->productId);
-        Q_ASSERT(device2.vendorId == productVendors[0]->vendorId);
-        Q_ASSERT(device2.serialNumber != QString::number(1000));
 
         std::vector<std::unique_ptr<DatabaseHandler::Device>> devices;
         m_DBHandler->getAllDevices(devices);
@@ -202,15 +194,16 @@ void TestHandler::testCaseDevice(bool requiredDataExists)
     }
 }
 
-void TestHandler::testCaseLog(bool requiredDataExists)
+void TestHandler::testCaseConnectedDevice(bool requiredDataExists)
 {
     try
     {
         QSqlQuery query;
-        query.exec("DELETE FROM log");
+        query.exec("DELETE FROM connecteddevice");
 
         if(!requiredDataExists)
         {
+            testCaseEdgeNode();
             testCaseDevice(false);
         }
 
@@ -224,11 +217,63 @@ void TestHandler::testCaseLog(bool requiredDataExists)
 
         for(int i = 0; i < edgeKeys.size(); ++i)
         {
-            m_DBHandler->logEvent(edgeKeys[i], devices[i]->productId, devices[i]->vendorId, "2021:09:09 22:36:00:00" + QString::number(i), "Number " + QString::number(i), devices[i]->serialNumber);
+            m_DBHandler->registerConnectedDevice(edgeKeys[i], devices[i]->productId, devices[i]->vendorId, devices[i]->serialNumber, "2021:09:09 22:36:00:00" + QString::number(i));
+        }
+
+        std::vector<std::unique_ptr<DatabaseHandler::ConnectedDevice>> connectedDevices;
+        m_DBHandler->getAllConnectedDevices(connectedDevices);
+        Q_ASSERT(connectedDevices.size() == 3);
+        Q_ASSERT(checkString((*(connectedDevices[0])).connectedEdgeNodeMacAddress, edgeKeys[0], edgeKeys[1], edgeKeys[2]));
+        Q_ASSERT(checkString((*(connectedDevices[1])).deviceSerialNumber, "1000", "1001", "1002"));
+
+        m_DBHandler->unregisterConnectedDevice(edgeKeys[1], devices[1]->productId, devices[1]->vendorId, devices[1]->serialNumber);
+
+        connectedDevices.clear();
+        m_DBHandler->getAllConnectedDevices(connectedDevices);
+        Q_ASSERT(connectedDevices.size() == 2);
+        for(const std::unique_ptr<DatabaseHandler::ConnectedDevice>& cd: connectedDevices)
+        {
+            Q_ASSERT(cd->connectedEdgeNodeMacAddress != edgeKeys[1]);
+            Q_ASSERT(cd->deviceProductId != devices[1]->productId);
+            Q_ASSERT(cd->deviceSerialNumber != devices[1]->serialNumber);
+        }
+
+        qCritical() << __PRETTY_FUNCTION__ << "Completed successfully";
+    }
+    catch(std::exception& e)
+    {
+        qFatal("testCaseLog failed with exception = %s", e.what());
+    }
+}
+
+void TestHandler::testCaseLog(bool requiredDataExists)
+{
+    try
+    {
+        QSqlQuery query;
+        query.exec("DELETE FROM log");
+
+        if(!requiredDataExists)
+        {
+            testCaseEdgeNode();
+            testCaseDevice(false);
+        }
+
+        QVector<QString> edgeKeys;
+        std::vector<std::unique_ptr<DatabaseHandler::Device>> devices;
+
+        m_DBHandler->getAllEdgeNodeKeys(edgeKeys);
+        m_DBHandler->getAllDevices(devices);
+        Q_ASSERT(edgeKeys.size() == devices.size());
+        Q_ASSERT(edgeKeys.size() == 3);
+
+        for(int i = 0; i < edgeKeys.size(); ++i)
+        {
+            m_DBHandler->logEvent(edgeKeys[i], devices[i]->productId, devices[i]->vendorId, devices[i]->serialNumber, "2021:09:09 22:36:00:00" + QString::number(i), "Number " + QString::number(i));
         }
 
         DatabaseHandler::LogEvent logEvent;
-        Q_ASSERT(m_DBHandler->getLoggedEvent(logEvent, edgeKeys[2], devices[2]->productId, devices[2]->vendorId, "2021:09:09 22:36:00:002", devices[2]->serialNumber));
+        Q_ASSERT(m_DBHandler->getLoggedEvent(logEvent, edgeKeys[2], devices[2]->productId, devices[2]->vendorId, devices[2]->serialNumber, "2021:09:09 22:36:00:002"));
 
         std::vector<std::unique_ptr<DatabaseHandler::LogEvent>> logEvents;
         m_DBHandler->getAllLoggedEvents(logEvents);
@@ -250,6 +295,7 @@ void TestHandler::testCaseAll()
     testVirus();
     testCaseProductVendor();
     testCaseDevice(true);
+    testCaseConnectedDevice(true);
     testCaseLog(true);
 }
 

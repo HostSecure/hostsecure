@@ -1,7 +1,8 @@
 QT -= gui
 QT += sql
 
-CONFIG += c++11 console
+#CONFIG += c++11 console
+CONFIG += c++2a
 CONFIG -= app_bundle
 
 # You can make your code fail to compile if it uses deprecated APIs.

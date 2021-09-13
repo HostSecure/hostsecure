@@ -34,13 +34,26 @@ public:
         QString productId = "";
         QString serialNumber = "";
     };
-    void registerDevice(const QString& productId, const QString& vendorId, const QString& serialNumber = "") const;
-    bool getDevice(Device& device, const QString& productId, const QString& vendorId, const QString& serialNumber = "") const;
+    void registerDevice(const QString& productId, const QString& vendorId, const QString& serialNumber) const;
+    bool getDevice(Device& device, const QString& productId, const QString& vendorId, const QString& serialNumber) const;
     void getAllDevices(std::vector<std::unique_ptr<Device>>& devices) const;
-    void setDeviceBlacklisted(const QString& productId, const QString& vendorId, const QString& serialNumber = "") const;
-    bool isDeviceBlackListed(const QString& productId, const QString& vendorId, const QString& serialNumber = "") const;
-    void setDeviceWhitelisted(const QString& productId, const QString& vendorId, const QString& serialNumber = "") const;
-    bool isDeviceWhiteListed(const QString& productId, const QString& vendorId, const QString& serialNumber = "") const;
+    void setDeviceBlacklisted(const QString& productId, const QString& vendorId, const QString& serialNumber) const;
+    bool isDeviceBlackListed(const QString& productId, const QString& vendorId, const QString& serialNumber) const;
+    void setDeviceWhitelisted(const QString& productId, const QString& vendorId, const QString& serialNumber) const;
+    bool isDeviceWhiteListed(const QString& productId, const QString& vendorId, const QString& serialNumber) const;
+
+    // Connected devices
+    struct ConnectedDevice
+    {
+        QString connectedEdgeNodeMacAddress = "";
+        QString deviceProductId = "";
+        QString deviceVendorId = "";
+        QString deviceSerialNumber = "";
+    };
+    void registerConnectedDevice(const QString& edgeNodeMacAddress, const QString& deviceProductId, const QString& deviceVendorId, const QString& deviceSerialNumber, const QString& timestamp);
+    void unregisterConnectedDevice(const QString& edgeNodeMacAddress, const QString& deviceProductId, const QString& deviceVendorId, const QString& deviceSerialNumber);
+    void getAllConnectedDevices(std::vector<std::unique_ptr<ConnectedDevice>>& connectedDevices);
+
 
     // ProductVendor
     struct ProductVendor
@@ -76,8 +89,8 @@ public:
         QString timestamp = "";
         QString eventDescription = "";
     };
-    void logEvent(const QString& edgeNodeMacAddress, const QString& deviceProductId, const QString& deviceVendorId, const QString& timestamp, const QString& eventDescription, const QString& deviceSerialNumber = "");
-    bool getLoggedEvent(LogEvent& logEvent, const QString& edgeNodeMacAddress, const QString& deviceProductId, const QString& deviceVendorId, const QString& timestamp, const QString& deviceSerialNumber = "") const;
+    void logEvent(const QString& edgeNodeMacAddress, const QString& deviceProductId, const QString& deviceVendorId, const QString& deviceSerialNumber, const QString& timestamp, const QString& eventDescription);
+    bool getLoggedEvent(LogEvent& logEvent, const QString& edgeNodeMacAddress, const QString& deviceProductId, const QString& deviceVendorId, const QString& deviceSerialNumber, const QString& timestamp) const;
     void getAllLoggedEvents(std::vector<std::unique_ptr<LogEvent>>& loggedEvents) const;
 
 private:
