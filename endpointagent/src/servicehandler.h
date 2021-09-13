@@ -32,7 +32,6 @@ public:
 //    void setParameter(QString name); // out s previous_value
     //USBGUARD_POLICY
     void listRules(QString label); // out a(us) ruleset
-    void appendRule(QString rule, uint parent_id, bool temporary); // out u id
     void removeRule(uint id); // out
     //USBGUARD_DEVICE
     void listDevices(QString query); // out a(us) devices
@@ -58,6 +57,7 @@ public slots:
                                QMap<QString, QString> attributes);
     void handleDevicePolicyChanged(uint id, uint target_old, uint target_new, QString device_rule, uint rule_id,
                              QMap<QString, QString> attributes);
+    void appendRule(QString device_id,QString device_serial, uint target, QString interface);
 //    void handleDevicePolicyApplied(uint id, uint target_new, uint device_rule, uint rule_id,
 //                             QMap < QString, QString  > attributes);
 // TODO

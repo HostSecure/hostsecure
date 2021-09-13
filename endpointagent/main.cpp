@@ -36,11 +36,21 @@ int main(int argc, char *argv[])
             &uh, &UplinkHandler::devicePresenceUpload);
     QObject::connect(&sh, &ServiceHandler::devicePolicyUpdate,
             &uh, &UplinkHandler::devicePolicyUpload);
+    QObject::connect(&uh, &UplinkHandler::appendServiceRule,
+            &sh, &ServiceHandler::appendRule);
 
     QObject::connect(&uh, &UplinkHandler::updateEdgeHandler,
             edge_handler.get(),&MessageHandler::Gateway::EdgeHandler::newDevicePresence);
 
     //std::cout << uh.getMacAddress().toStdString();
+    auto connRes = QObject::connect(edge_handler.get(), &MessageHandler::Gateway::EdgeHandler::newEdgeServiceRule,
+           &uh , &UplinkHandler::rulesetDownload);
+    if(!connRes)
+    {
+        qDebug() << "Connection Unsuccessful";
+    }
+
+    edge_handler->register_new_edge(uh.getHardwareAddress());
 
     return a.exec();
 }

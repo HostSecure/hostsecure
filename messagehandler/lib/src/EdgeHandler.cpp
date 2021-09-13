@@ -12,7 +12,7 @@ MessageHandler::Gateway::EdgeHandler::EdgeHandler(QString& _address, quint16& _p
  *
  * This method is called by new edge computers on the network
  */
-void MessageHandler::Gateway::EdgeHandler::register_new_edge(QString& mac_address)
+void MessageHandler::Gateway::EdgeHandler::register_new_edge(const QString& mac_address)
 {
     QJsonObject payload;
     payload["MACAddress"] = mac_address;
@@ -40,6 +40,14 @@ void MessageHandler::Gateway::EdgeHandler::newDevicePresence(QString device_id, 
     payload["target"] = qint64(target);
     payload["event"] = qint64(event);
     payload["interface"] = interface;
+
+    qDebug() << "Device Status Update:" <<
+                "\nDevice ID " << device_id <<
+                "\nDevice Serial " << device_serial <<
+                "\nWith-Interface " << interface <<
+                "\nTarget code " << target <<
+                "\nEvent code " << event <<
+                "\nEdge node " << m_hardwareAddress << "\n" ;
 
     QString topic = "/edges/new_edge_device_update";
     this->publish(topic, payload);

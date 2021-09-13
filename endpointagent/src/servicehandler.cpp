@@ -51,11 +51,20 @@ void ServiceHandler::listRules(QString label)
 
 }
 
-void ServiceHandler::appendRule(QString rule, uint parent_id, bool temporary)
+void ServiceHandler::appendRule(QString device_id,QString device_serial, uint target, QString interface)
 {
+    uint parent_id = 1;
+    bool temporary = 0;
+    std::stringstream sstr_rule;
+    std::string rule_target = target ?  "block id " : "allow id ";
+    sstr_rule << rule_target << device_id.toStdString() << " serial \"" << device_serial.toStdString() <<
+            "\" with-interface { " << interface.toStdString() << " }";
+    QString rule;
+    rule = rule.fromStdString(sstr_rule.str());
+    qDebug() << rule;
 
-    QDBusMessage id = m_ifaceUSBGuardPolicy->call("appendRule",rule,parent_id,temporary);
-    qDebug() << id;
+    QDBusMessage id = m_ifaceUSBGuardPolicy->call("appendRule", rule , parent_id,temporary );
+    qDebug() << "New USB rule : " << id;
 }
 
 void ServiceHandler::removeRule(uint id)
@@ -67,7 +76,7 @@ void ServiceHandler::removeRule(uint id)
 void ServiceHandler::listDevices(QString query)
 {
     QDBusMessage devices = m_ifaceUSBGuardDevices->call("listDevices",query);
- //   qDebug() << devices.arguments().at(0)[0]; //a(us)
+   // qDebug() << devices.arguments().at(0)[0]; //a(us)
    // for( auto e : devices.arguments())
 
 
