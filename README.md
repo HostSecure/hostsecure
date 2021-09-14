@@ -13,7 +13,7 @@ Optional
 
 
 # Build guide
-To build the project we first need to build QtMqtt from source since this is only included in Qt for Automation 
+To build the project we first need to build QtMqtt from source since this is only included in Qt for Automation.
 
 ## QtMqtt
 - git clone https://github.com/qt/qtmqtt.git
@@ -24,6 +24,9 @@ To build the project we first need to build QtMqtt from source since this is onl
 - PATH_TO_QT_COMPILER/bin/qmake .. 
 - make 
 - make install
+
+## Building HostSecure
+Open HostSecure.pro in QtCreator and choose which application you want to build. 
 
 # TODO
 Add how to start mosquitto server and how to use MQTT-explorer
