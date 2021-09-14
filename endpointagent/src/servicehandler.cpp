@@ -1,4 +1,5 @@
 #include "servicehandler.h"
+#include "uplinkhandler.h"
 #include <QtDBus/QDBusMessage>
 #include <QtDBus/QDBusConnection>
 #include <QtDBus/QDBusArgument>
@@ -6,7 +7,9 @@
 #include <sstream>
 #include <string>
 
-ServiceHandler::ServiceHandler(QObject *parent) : QObject(parent)
+ServiceHandler::ServiceHandler(QObject *parent)
+    : QObject(parent)
+    , m_uplinkHandler(new UplinkHandler(parent))
 {
 
     qDBusRegisterMetaType<QMap<QString,QString>>();
@@ -40,6 +43,12 @@ ServiceHandler::ServiceHandler(QObject *parent) : QObject(parent)
 
     listDevices("allow");
     listDevices("block");
+
+    connect(m_uplinkHandler.get(), &UplinkHandler::appendServiceRule, this, &ServiceHandler::appendRule);
+}
+
+ServiceHandler::~ServiceHandler()
+{
 
 }
 
@@ -93,9 +102,7 @@ void ServiceHandler::handleDevicePresenceChanged(uint id, uint event, uint targe
  //   qDebug() << id << " " << event << " " << target << " " << device_rule << " " << attributes;
     Q_UNUSED(id);
     Q_UNUSED(device_rule);
-    emit devicePresenceUpdate(attributes["id"], attributes["serial"], target, attributes["with-interface"], event );
-
-
+    m_uplinkHandler->devicePresenceUpload(attributes["id"], attributes["serial"], target, attributes["with-interface"], event);
 }
 
 void ServiceHandler::handleDevicePolicyChanged(uint id, uint target_old, uint target_new,
@@ -107,7 +114,6 @@ void ServiceHandler::handleDevicePolicyChanged(uint id, uint target_old, uint ta
     Q_UNUSED(target_old);
   //  qDebug() << "policy";
    // qDebug() << id << " " << target_old << " " << target_new << " " << device_rule << rule_id << " " << attributes;
-    emit devicePolicyUpdate(attributes["id"], attributes["serial"], target_new, attributes["with-interface"] );
-
+    m_uplinkHandler->devicePolicyUpload(attributes["id"], attributes["serial"], target_new, attributes["with-interface"]);
 }
 

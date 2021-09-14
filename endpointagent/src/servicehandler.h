@@ -16,11 +16,13 @@ QString DBUS_POLICY_PATH     =  "/org/usbguard1/Policy";
 QString DBUS_DEVICES_INTERFACE= "org.usbguard.Devices1";
 QString DBUS_DEVICES_PATH     = "/org/usbguard1/Devices";
 }
+class UplinkHandler;
 class ServiceHandler : public QObject
 {
     Q_OBJECT
 public:
     explicit ServiceHandler(QObject *parent = nullptr);
+    ~ServiceHandler();
 
 //    QDBusInterface *m_ifaceUSBGuardRoot;
     QDBusInterface *m_ifaceUSBGuardPolicy;
@@ -62,8 +64,7 @@ public slots:
 //                             QMap < QString, QString  > attributes);
 // TODO
 
-
-
-
+private:
+    std::unique_ptr<UplinkHandler> m_uplinkHandler;
 };
 

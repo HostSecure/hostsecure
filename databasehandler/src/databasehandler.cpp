@@ -191,10 +191,19 @@ void DatabaseHandler::getAllEdgeNodes(std::vector<std::unique_ptr<EdgeNode> > &e
 void DatabaseHandler::setEdgeNodeOnlineStatus(const QString &macAddress, bool isOnline, const QString &lastHeartbeatTimestamp)
 {
     QSqlQuery query;
-    query.prepare("UPDATE edgenode SET isonline = ?, lastheartbeat = ? WHERE macAddress = ?");
-    query.bindValue(0, (isOnline ? 1 : 0));
-    query.bindValue(1, lastHeartbeatTimestamp);
-    query.bindValue(2, macAddress);
+    if(lastHeartbeatTimestamp.isEmpty())
+    {
+        query.prepare("UPDATE edgenode SET isonline = ? WHERE macAddress = ?");
+        query.bindValue(0, (isOnline ? 1 : 0));
+        query.bindValue(1, macAddress);
+    }
+    else
+    {
+        query.prepare("UPDATE edgenode SET isonline = ?, lastheartbeat = ? WHERE macAddress = ?");
+        query.bindValue(0, (isOnline ? 1 : 0));
+        query.bindValue(1, lastHeartbeatTimestamp);
+        query.bindValue(2, macAddress);
+    }
 
     if(!query.exec())
     {
@@ -375,6 +384,20 @@ void DatabaseHandler::registerConnectedDevice(const QString &edgeNodeMacAddress,
     {
         qCritical() << __PRETTY_FUNCTION__ << "Failed to register connected device: " << query.lastError();
         throw std::runtime_error("Failed to register connected device");
+    }
+}
+
+void DatabaseHandler::unregisterConnectedDevicesOnEdgeNode(const QString &edgeNodeMacAddress)
+{
+    QSqlQuery query;
+    query.prepare("DELETE FROM connecteddevice "
+                  "WHERE edgenodemacaddress = ?");
+    query.bindValue(0, edgeNodeMacAddress);
+
+    if(!query.exec())
+    {
+        qCritical() << __PRETTY_FUNCTION__ << "Failed to unregister all connected devices on edge node: " << query.lastError();
+        throw std::runtime_error("Failed to unregister all connected devices on edge node");
     }
 }
 

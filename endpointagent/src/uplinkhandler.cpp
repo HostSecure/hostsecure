@@ -1,8 +1,10 @@
 #include "uplinkhandler.h"
+#include <msg/msgedge.h>
+#include <msg/msgdevice.h>
 #include <QDebug>
 #include <iostream>
 
-UplinkHandler::UplinkHandler(QObject *parent) : QObject(parent)
+UplinkHandler::UplinkHandler(QObject *parent) : MqttClientBase(parent)
 {
     m_hardwareAddress = fetchMac();
 
@@ -22,7 +24,16 @@ UplinkHandler::UplinkHandler(QObject *parent) : QObject(parent)
 //        qDebug() << "Connection Unsuccessful";
 //    }
 
-//    edge_handler->register_new_edge(m_hardwareAddress);
+    //    edge_handler->register_new_edge(m_hardwareAddress);
+}
+
+UplinkHandler::~UplinkHandler()
+{
+    // Worth a shot...
+    MsgEdge edge;
+    edge.macaddress = m_hardwareAddress;
+    edge.isOnline = false;
+    publish(QMqttTopicName(QString("edges/%s").arg(m_hardwareAddress)), edge);
 }
 
 QString UplinkHandler::fetchMac()
@@ -39,9 +50,15 @@ QString UplinkHandler::fetchMac()
     return mac;
 }
 
-QString UplinkHandler::getHardwareAddress()
+void UplinkHandler::brokerConnected()
 {
-   return this->m_hardwareAddress;
+    qInfo() << "Broker connected!";
+
+    MsgEdge edge;
+    edge.macaddress = m_hardwareAddress;
+    edge.isOnline = true;
+
+    publish(QMqttTopicName(QString("edges/%s").arg(m_hardwareAddress)), edge);
 }
 
 /// Target 0 = allow, 1 = block, 2 = reject, 3 = match, 4 = unknown, 5 = device, 6 = empty, 7 = invalid
@@ -49,9 +66,21 @@ QString UplinkHandler::getHardwareAddress()
 void UplinkHandler::devicePresenceUpload(QString device_id, QString device_serial, uint target, QString interface, uint event)
 {
     qDebug() << "Updating EdgeHandler";
-    emit updateEdgeHandler(device_id, device_serial, target, event, interface, m_hardwareAddress);
-    //edge_handler->newDevicePresence(device_id, device_serial,target,event, interface, m_hardwareAddress);
-
+    if(event == 3)
+    {
+        // TODO: Handle device unplugged
+    }
+    else
+    {
+        MsgDevice msg;
+        msg.deviceId = device_id;
+        msg.deviceSerial = device_serial;
+        msg.target = target;
+        msg.interface = interface;
+        msg.event = event;
+        msg.lastHeartBeat = QDateTime::currentDateTimeUtc().toString("dd.MM.yyyy hh:mm:ss.zzz");
+        publish(QMqttTopicName( QString( "edges/%s/%s" ).arg( m_hardwareAddress, device_id ) ), msg);
+    }
 }
 
 void UplinkHandler::rulesetDownload(QString device_id, QString device_serial, uint target, QString interface)
@@ -60,12 +89,20 @@ void UplinkHandler::rulesetDownload(QString device_id, QString device_serial, ui
     emit appendServiceRule(device_id, device_serial,target,interface);
 
 }
+
 void UplinkHandler::devicePolicyUpload(QString device_id, QString device_serial, uint target, QString interface)
 {
     qDebug() << "Updating EdgeHandler";
-    emit updateEdgeHandler(device_id, device_serial, target, 0, interface, m_hardwareAddress);
-    //edge_handler->newDevicePresence(device_id, device_serial,target,0, interface, m_hardwareAddress);
+    MsgDevice msg;
+    msg.deviceId = device_id;
+    msg.deviceSerial = device_serial;
+    msg.target = target;
+    msg.interface = interface;
+    msg.event = 0;
+    msg.lastHeartBeat = QDateTime::currentDateTimeUtc().toString("dd.MM.yyyy hh:mm:ss.zzz");
+    publish(QMqttTopicName( QString( "edges/%s/%s" ).arg( m_hardwareAddress, device_id ) ), msg);
 
+    emit updateEdgeHandler(device_id, device_serial, target, 0, interface, m_hardwareAddress);
 }
 
 

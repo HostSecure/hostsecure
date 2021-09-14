@@ -10,7 +10,6 @@ class DatabaseHandler
 public:
     DatabaseHandler(const QString& databasePath);
 
-    // Timestamp format is "YYYY:MM:DD [HH:MM:SS.SSS]".
     // All functions should be assumed to throw std::exceptions upon failure
 
     // Edge node
@@ -51,6 +50,7 @@ public:
         QString deviceSerialNumber = "";
     };
     void registerConnectedDevice(const QString& edgeNodeMacAddress, const QString& deviceProductId, const QString& deviceVendorId, const QString& deviceSerialNumber, const QString& timestamp);
+    void unregisterConnectedDevicesOnEdgeNode(const QString& edgeNodeMacAddress);
     void unregisterConnectedDevice(const QString& edgeNodeMacAddress, const QString& deviceProductId, const QString& deviceVendorId, const QString& deviceSerialNumber);
     void getAllConnectedDevices(std::vector<std::unique_ptr<ConnectedDevice>>& connectedDevices);
 

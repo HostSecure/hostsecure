@@ -1,8 +1,8 @@
 #include <QCoreApplication>
 
-#include "loghandler.h"
-#include "databasehandler.h"
-#include "testhandler.h"
+#include <loghandler.h>
+#include <databasemanager.h>
+#include <testhandler.h>
 
 int main(int argc, char *argv[])
 {
@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        DatabaseHandler dbHandler(QString(dataDir).append("/Databases/test.db"));
+        DatabaseManager dbAdmin(QString(dataDir).append("/Databases/HostSecure.db"), &a);
     }
 
     return a.exec();

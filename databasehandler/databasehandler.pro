@@ -1,5 +1,5 @@
 QT -= gui
-QT += sql
+QT += sql mqtt
 
 #CONFIG += c++11 console
 CONFIG += c++2a
@@ -11,16 +11,24 @@ CONFIG -= app_bundle
 
 INCLUDEPATH += src
 
+DEPENDPATH += ../messagehandler/lib/include
+INCLUDEPATH += ../messagehandler/lib/include
+LIBS += -L../messagehandler/lib -lmessagehandler
+
 SOURCES += \
     main.cpp \
     src/databasedatafileparser.cpp \
     src/databasehandler.cpp \
+    src/databasemanager.cpp \
+    src/databasemqttclient.cpp \
     src/loghandler.cpp \
     src/testhandler.cpp
 
 HEADERS += \
     src/databasedatafileparser.h \
     src/databasehandler.h \
+    src/databasemanager.h \
+    src/databasemqttclient.h \
     src/loghandler.h \
     src/testhandler.h
 
