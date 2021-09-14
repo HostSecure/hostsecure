@@ -1,4 +1,4 @@
-# hostsecure
+# Hostsecure
 HostSecure is a data intensive security management platform for intrusion 
 detection and prevention for industrial systems.
 
@@ -16,13 +16,13 @@ Optional
 To build the project we first need to build QtMqtt from source since this is only included in Qt for Automation 
 
 ## QtMqtt
-git clone https://github.com/qt/qtmqtt.git
-git checkout --track origin/6.1.3
+- git clone https://github.com/qt/qtmqtt.git
+- git checkout --track origin/6.1.3
 
 ### qmake
-Navigate to downloaded qtmqtt folder
-mkdir build
-cd build
-PATH_TO_QT_COMPILER/bin/qmake .. 
-make 
-make install
+- Navigate to downloaded qtmqtt folder
+- mkdir build
+- cd build
+- PATH_TO_QT_COMPILER/bin/qmake .. 
+- make 
+- make install
