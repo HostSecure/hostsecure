@@ -4,10 +4,10 @@
 
 namespace
 {
-   constexpr auto MQTT_ADDRESS = "localhost";
+//   constexpr auto MQTT_ADDRESS = "localhost";
 //   constexpr auto MQTT_PORT = 1883;
 
-//   constexpr auto MQTT_ADDRESS = "92.220.65.49";
+   constexpr auto MQTT_ADDRESS = "92.220.65.49";
    constexpr auto MQTT_PORT = 1883;
 }
 

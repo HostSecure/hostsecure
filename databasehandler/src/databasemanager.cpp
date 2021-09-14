@@ -49,6 +49,9 @@ void DatabaseManager::deviceRemoved(const QString &edgeId, const QString &device
     {
         qCritical() << "Received device removed with unrecognizable deviceid: " << deviceId;
     }
-    m_DatabaseHandler->unregisterConnectedDevice(edgeId, vendorProductIds[1], vendorProductIds[0], deviceSerial);
-    m_DatabaseHandler->logEvent(edgeId, vendorProductIds[1], vendorProductIds[0], deviceSerial, QDateTime::currentDateTimeUtc().toString(), "Device disconnected");
+    else
+    {
+        m_DatabaseHandler->unregisterConnectedDevice(edgeId, vendorProductIds[1], vendorProductIds[0], deviceSerial);
+        m_DatabaseHandler->logEvent(edgeId, vendorProductIds[1], vendorProductIds[0], deviceSerial, QDateTime::currentDateTimeUtc().toString(), "Device disconnected");
+    }
 }

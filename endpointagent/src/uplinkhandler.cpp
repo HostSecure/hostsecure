@@ -33,7 +33,7 @@ UplinkHandler::~UplinkHandler()
     MsgEdge edge;
     edge.macaddress = m_hardwareAddress;
     edge.isOnline = false;
-    publish(QMqttTopicName(QString("edges/%s").arg(m_hardwareAddress)), edge);
+    publish(QMqttTopicName(QString("edges/%1").arg(m_hardwareAddress)), edge);
 }
 
 QString UplinkHandler::fetchMac()
@@ -58,7 +58,7 @@ void UplinkHandler::brokerConnected()
     edge.macaddress = m_hardwareAddress;
     edge.isOnline = true;
 
-    publish(QMqttTopicName(QString("edges/%s").arg(m_hardwareAddress)), edge);
+    publish(QMqttTopicName(QString("edges/%1").arg(m_hardwareAddress)), edge);
 }
 
 /// Target 0 = allow, 1 = block, 2 = reject, 3 = match, 4 = unknown, 5 = device, 6 = empty, 7 = invalid
@@ -79,7 +79,7 @@ void UplinkHandler::devicePresenceUpload(QString device_id, QString device_seria
         msg.interface = interface;
         msg.event = event;
         msg.lastHeartBeat = QDateTime::currentDateTimeUtc().toString("dd.MM.yyyy hh:mm:ss.zzz");
-        publish(QMqttTopicName( QString( "edges/%s/%s" ).arg( m_hardwareAddress, device_id ) ), msg);
+        publish(QMqttTopicName( QString( "edges/%1/%2" ).arg( m_hardwareAddress, device_id ) ), msg);
     }
 }
 
@@ -100,7 +100,7 @@ void UplinkHandler::devicePolicyUpload(QString device_id, QString device_serial,
     msg.interface = interface;
     msg.event = 0;
     msg.lastHeartBeat = QDateTime::currentDateTimeUtc().toString("dd.MM.yyyy hh:mm:ss.zzz");
-    publish(QMqttTopicName( QString( "edges/%s/%s" ).arg( m_hardwareAddress, device_id ) ), msg);
+    publish(QMqttTopicName( QString( "edges/%1/%2" ).arg( m_hardwareAddress, device_id ) ), msg);
 
     emit updateEdgeHandler(device_id, device_serial, target, 0, interface, m_hardwareAddress);
 }

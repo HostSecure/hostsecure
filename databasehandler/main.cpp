@@ -6,7 +6,7 @@
 
 int main(int argc, char *argv[])
 {
-    bool test = true;
+    bool test = false;
     LogHandler logger;
 
     QCoreApplication a(argc, argv);
@@ -21,11 +21,11 @@ int main(int argc, char *argv[])
     {
         TestHandler testHandler(QString(dataDir).append("/Databases/testcases.db"));
         testHandler.testCaseAll();
+        return a.exec();
     }
     else
     {
         DatabaseManager dbAdmin(QString(dataDir).append("/Databases/HostSecure.db"), &a);
+        return a.exec();
     }
-
-    return a.exec();
 }
