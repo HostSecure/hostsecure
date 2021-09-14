@@ -28,5 +28,12 @@ To build the project we first need to build QtMqtt from source since this is onl
 ## Building HostSecure
 Open HostSecure.pro in QtCreator and choose which application you want to build. 
 
-# TODO
-Add how to start mosquitto server and how to use MQTT-explorer
+# Running mosqitto mqtt server on host
+After installing mosquitto you just need to start the service.
+```
+# To start the service
+sudo service mosquitto start
+
+# To stop the service
+sudo service mosquitto stop
+```
