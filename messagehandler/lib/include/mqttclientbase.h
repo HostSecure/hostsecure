@@ -10,10 +10,14 @@ class MqttClientBase : public QMqttClient
    Q_PROPERTY( QString errorString READ errorString NOTIFY errorStringChanged )
 
 public:
-   void publish( const QMqttTopicName& a_topic,
-                 const MsgBase& a_sample,
-                 quint8 a_qos = 0,
-                 bool a_retain = false );
+   qint32 publish( const QMqttTopicName& a_topic,
+                   const MsgBase& a_sample,
+                   quint8 a_qos = 0,
+                   bool a_retain = false );
+   qint32 publish( const QMqttTopicName& a_topic,
+                   const QByteArray& a_sample = QByteArray(),
+                   quint8 a_qos = 0,
+                   bool a_retain = false );
 
    QString protocolVersionString() const;
    QString stateString() const;

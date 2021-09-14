@@ -12,13 +12,28 @@ HostSecureCollection::HostSecureCollection( QObject* a_parent )
    QObject::connect( m_mmiMqttClient, &MmiMqttClient::deviceRemoved, m_edgeModel, &EdgeModel::deviceRemoved );
 }
 
+
+namespace
+{
+   int edgeId = 12;
+
+   QString getedgeId()
+   {
+      return QString( "21:12:324:324:%1" ).arg( edgeId );
+   }
+}
+void HostSecureCollection::incrementEdgeId()
+{
+   edgeId++;
+}
+
 void HostSecureCollection::sendEdgeMessage()
 {
    MsgEdge sample;
-   sample.macaddress = "21:12:324:324";
+   sample.macaddress = getedgeId();
    sample.isOnline = true;
 
-   m_mmiMqttClient->publish( QMqttTopicName( "edges/21:12:324:324" ), sample );
+   m_mmiMqttClient->publish( QMqttTopicName( QString( "edges/%1").arg( getedgeId() ) ), sample );
 }
 
 #include <QDateTime>
@@ -34,7 +49,7 @@ void HostSecureCollection::sendDeviceMessage()
    sample.event = 321;
    sample.interface = "interface";
 
-   m_mmiMqttClient->publish( QMqttTopicName( QString( "edges/21:12:324:324/%1" ).arg( sample.deviceId ) ), sample );
+   m_mmiMqttClient->publish( QMqttTopicName( QString( "edges/%1/%2" ).arg( getedgeId() ).arg( sample.deviceId ) ), sample );
    deviceId++;
 }
 

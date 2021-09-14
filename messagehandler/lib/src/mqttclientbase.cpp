@@ -4,10 +4,10 @@
 
 namespace
 {
-//   constexpr auto MQTT_ADDRESS = "localhost";
+   constexpr auto MQTT_ADDRESS = "localhost";
 //   constexpr auto MQTT_PORT = 1883;
 
-   constexpr auto MQTT_ADDRESS = "92.220.65.49";
+//   constexpr auto MQTT_ADDRESS = "92.220.65.49";
    constexpr auto MQTT_PORT = 1883;
 }
 
@@ -26,15 +26,22 @@ MqttClientBase::MqttClientBase( QObject* a_parent )
    connectToHost();
 }
 
-void MqttClientBase::publish( const QMqttTopicName& a_topic,
-                              const MsgBase& a_sample,
-                              quint8 a_qos,
-                              bool a_retain )
+qint32 MqttClientBase::publish( const QMqttTopicName& a_topic,
+                                const MsgBase& a_sample,
+                                quint8 a_qos,
+                                bool a_retain )
 {
    QJsonDocument data( a_sample.toJson() );
-   QMqttClient::publish( a_topic, data.toJson(), a_qos, a_retain );
+   return publish( a_topic, data.toJson(), a_qos, a_retain );
+}
 
+qint32 MqttClientBase::publish( const QMqttTopicName& a_topic,
+                                const QByteArray& a_sample,
+                                quint8 a_qos,
+                                bool a_retain )
+{
    qDebug() << "Published a message to" << a_topic;
+   return QMqttClient::publish( a_topic, a_sample, a_qos, a_retain );
 }
 
 QString MqttClientBase::protocolVersionString() const

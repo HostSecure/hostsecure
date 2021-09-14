@@ -23,7 +23,6 @@ Item {
             currentIndex: 0
             model: [
                { title: "Home",   iconName: "home" },
-               { title: "Edges",  iconName: "computer" },
                { title: "Status", iconName: "" },
             ]
             delegate: TabButton {
@@ -50,7 +49,6 @@ Item {
             anchors.fill: parent
             currentIndex: setupBar.currentIndex
             HomeView { }
-            EdgeView { }
             MqttStatus { }
          }
       }

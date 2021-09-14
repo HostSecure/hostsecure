@@ -13,6 +13,7 @@ public:
    explicit HostSecureCollection( QObject* a_parent = nullptr );
 
 public slots:
+   void incrementEdgeId();
    void sendEdgeMessage();
    void sendDeviceMessage();
 

@@ -85,6 +85,10 @@ Pane {
          ColumnLayout {
 
             Button {
+               text: "Inc edge"
+               onClicked: HSC.incrementEdgeId()
+            }
+            Button {
                text: "Send edge"
                onClicked: HSC.sendEdgeMessage()
             }
