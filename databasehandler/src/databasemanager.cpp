@@ -18,13 +18,27 @@ DatabaseManager::DatabaseManager(const QString &databaseName, QObject *parent)
 
 void DatabaseManager::edgeChanged(const QString &edgeId, const MsgEdge &sample)
 {
-    m_DatabaseHandler->registerOrUpdateEdgeNode(edgeId, sample.isOnline, QDateTime::currentDateTimeUtc().toString());
+    try
+    {
+        m_DatabaseHandler->registerOrUpdateEdgeNode(edgeId, sample.isOnline, QDateTime::currentDateTimeUtc().toString());
+    }
+    catch (std::exception& e)
+    {
+        // Ignore. Handled in database
+    }
 }
 
 void DatabaseManager::edgeRemoved(const QString &edgeId)
 {
-    m_DatabaseHandler->setEdgeNodeOnlineStatus(edgeId, false);
-    m_DatabaseHandler->unregisterConnectedDevicesOnEdgeNode(edgeId);
+    try
+    {
+        m_DatabaseHandler->setEdgeNodeOnlineStatus(edgeId, false);
+        m_DatabaseHandler->unregisterConnectedDevicesOnEdgeNode(edgeId);
+    }
+    catch (std::exception& e)
+    {
+        // Ignore. Handled in database
+    }
 }
 
 void DatabaseManager::deviceChanged(const QString &edgeId, const QString &deviceId, const MsgDevice &sample)
@@ -36,9 +50,16 @@ void DatabaseManager::deviceChanged(const QString &edgeId, const QString &device
     }
     else
     {
-        m_DatabaseHandler->registerDevice(vendorProductIds[1], vendorProductIds[0], sample.deviceSerial);
-        m_DatabaseHandler->registerConnectedDevice(edgeId, vendorProductIds[1], vendorProductIds[0], sample.deviceSerial, sample.lastHeartBeat);
-        m_DatabaseHandler->logEvent(edgeId, vendorProductIds[1], vendorProductIds[0], sample.deviceSerial, QDateTime::currentDateTimeUtc().toString(), "Device connected");
+        try
+        {
+            m_DatabaseHandler->registerDevice(vendorProductIds[1], vendorProductIds[0], sample.deviceSerial);
+            m_DatabaseHandler->registerConnectedDevice(edgeId, vendorProductIds[1], vendorProductIds[0], sample.deviceSerial, sample.lastHeartBeat);
+            m_DatabaseHandler->logEvent(edgeId, vendorProductIds[1], vendorProductIds[0], sample.deviceSerial, QDateTime::currentDateTimeUtc().toString(), "Device connected");
+        }
+        catch (std::exception& e)
+        {
+            // Ignore. Handled in database
+        }
     }
 }
 
@@ -51,7 +72,14 @@ void DatabaseManager::deviceRemoved(const QString &edgeId, const QString &device
     }
     else
     {
-        m_DatabaseHandler->unregisterConnectedDevice(edgeId, vendorProductIds[1], vendorProductIds[0], deviceSerial);
-        m_DatabaseHandler->logEvent(edgeId, vendorProductIds[1], vendorProductIds[0], deviceSerial, QDateTime::currentDateTimeUtc().toString(), "Device disconnected");
+        try
+        {
+            m_DatabaseHandler->unregisterConnectedDevice(edgeId, vendorProductIds[1], vendorProductIds[0], deviceSerial);
+            m_DatabaseHandler->logEvent(edgeId, vendorProductIds[1], vendorProductIds[0], deviceSerial, QDateTime::currentDateTimeUtc().toString(), "Device disconnected");
+        }
+        catch (std::exception& e)
+        {
+            // Ignore. Handled in database
+        }
     }
 }
