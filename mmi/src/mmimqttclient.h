@@ -3,6 +3,11 @@
 #include <msg/msgedge.h>
 #include <msg/msgdevice.h>
 
+//!
+//! \brief The MmiMqttClient class
+//! Registers all mqtt topics relevant for the MMI and
+//! transmits signal for each received topic
+//!
 class MmiMqttClient : public MqttClientBase
 {
    Q_OBJECT

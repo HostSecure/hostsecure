@@ -13,14 +13,12 @@ SOURCES += \
     src/hostsecurecollection.cpp \
     src/edgemodel.cpp \
     src/devicemodel.cpp \
-    src/commonutils.cpp \
     src/mmimqttclient.cpp
 
 HEADERS += \
     src/hostsecurecollection.h \
     src/edgemodel.h \
     src/devicemodel.h \
-    src/commonutils.h \
     src/mmimqttclient.h
 
 RESOURCES += \

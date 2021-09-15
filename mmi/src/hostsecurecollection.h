@@ -3,6 +3,10 @@
 #include <mmimqttclient.h>
 #include "edgemodel.h"
 
+//!
+//! \brief The HostSecureCollection class
+//! Collection class to connect all depended classes with signals and slots
+//!
 class HostSecureCollection : public QObject
 {
    Q_OBJECT

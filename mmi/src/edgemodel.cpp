@@ -94,8 +94,7 @@ void EdgeModel::deviceChanged( const QString& a_edgeId, const QString& a_deviceI
 
    if ( iter != m_list.end() )
    {
-      const auto idx = std::distance( std::begin( m_list ), iter );
-      m_list[ idx ].deviceModel->deviceChanged( a_deviceId, a_sample );
+      iter->deviceModel->deviceChanged( a_deviceId, a_sample );
    }
    else
    {
@@ -115,8 +114,7 @@ void EdgeModel::deviceRemoved( const QString& a_edgeId, const QString& a_deviceI
 
    if ( iter != m_list.end() )
    {
-      const auto idx = std::distance( std::begin( m_list ), iter );
-      m_list[ idx ].deviceModel->deviceRemoved( a_deviceId );
+      iter->deviceModel->deviceRemoved( a_deviceId );
    }
    else
    {

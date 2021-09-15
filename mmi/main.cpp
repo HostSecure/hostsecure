@@ -45,6 +45,10 @@ int main( int argc, char *argv[] )
 
 namespace
 {
+   //!
+   //! \brief registerTypes Register QtObject in Qt metadata to be able to access
+   //! the exposed properties and functions in QML.
+   //!
    void registerTypes()
    {
       constexpr auto msg = "Cannot create from QML..";

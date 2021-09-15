@@ -49,7 +49,7 @@ void HostSecureCollection::sendDeviceMessage()
    sample.event = 321;
    sample.interface = "interface";
 
-   m_mmiMqttClient->publish( QMqttTopicName( QString( "edges/%1/%2" ).arg( getedgeId() ).arg( sample.deviceId ) ), sample );
+   m_mmiMqttClient->publish( QMqttTopicName( QString( "edges/%1/%2" ).arg( getedgeId(), sample.deviceId ) ), sample );
    deviceId++;
 }
 
