@@ -18,7 +18,7 @@ DatabaseManager::DatabaseManager(const QString &databaseName, QObject *parent)
 
 void DatabaseManager::edgeChanged(const QString &edgeId, const MsgEdge &sample)
 {
-    m_DatabaseHandler->registerEdgeNode(edgeId, sample.isOnline, QDateTime::currentDateTimeUtc().toString());
+    m_DatabaseHandler->registerOrUpdateEdgeNode(edgeId, sample.isOnline, QDateTime::currentDateTimeUtc().toString());
 }
 
 void DatabaseManager::edgeRemoved(const QString &edgeId)

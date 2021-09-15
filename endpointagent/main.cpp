@@ -1,22 +1,11 @@
 #include <QCoreApplication>
-#include <QObject>
-#include <string>
-#include <vector>
-#include <iostream>
-#include <parser.h>
-#include <unistd.h>
 
 #include "servicehandler.h"
-#include "uplinkhandler.h"
 
 
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-
-    /* Configure broker (server) */
-//    QString broker_addr = "test.mosquitto.org";
-//    quint16 broker_port = 1883;
 
     ServiceHandler sh;
     //sh.listDevices("allow");

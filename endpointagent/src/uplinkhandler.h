@@ -15,16 +15,13 @@ public:
 
 
 signals:
-    void updateEdgeHandler(QString device_id, QString device_serial, uint target, uint event, QString interface, QString machine_address);
     void appendServiceRule(QString device_id,QString device_serial ,uint target,QString interface);
 
 public slots:
 
-    void devicePolicyUpload(QString device_id, QString device_serial, uint target, QString interface);
-    void devicePresenceUpload(QString device_id, QString device_serial, uint target, QString interface, uint event);
-//    void rulesetUpload(QString device_id, QString device_serial, uint target, QString interface);
-    void rulesetDownload(QString device_id, QString device_serial, uint target, QString interface);
-  //  void currentDevicesUpload(QString device_id, QString device_serial, uint target, QString interface);
+    void devicePolicyUpload(const QString& device_id, const QString& device_serial, const uint target, const QString& interface);
+    void devicePresenceUpload(const QString& device_id, const QString& device_serial, const uint target, const QString& interface, const uint event);
+    void rulesetDownload(const QString& device_id, const QString& device_serial, const uint target, const QString& interface);
 
 
 private:

@@ -111,7 +111,7 @@ DatabaseHandler::DatabaseHandler(const QString& databasePath)
     }
 }
 
-void DatabaseHandler::registerEdgeNode(const QString &macaddress, bool isOnline, const QString& lastHeartbeatTimestamp) const
+void DatabaseHandler::registerOrUpdateEdgeNode(const QString &macaddress, bool isOnline, const QString& lastHeartbeatTimestamp) const
 {
     QSqlQuery query;
     // NOT an UPSERT, but it's ok as we update every attribute of the table and we don't use an auto id.

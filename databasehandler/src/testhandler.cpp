@@ -30,12 +30,12 @@ void TestHandler::testCaseEdgeNode()
         query.exec("DELETE FROM edgenode");
 
         DatabaseHandler::EdgeNode node;
-        m_DBHandler->registerEdgeNode("ABCD", true, "2021-08-27 09:19:00.000");
-        m_DBHandler->registerEdgeNode("EFGH", false, "2011-04-15 17:33:04.372");
-        m_DBHandler->registerEdgeNode("IJKL", true, "2016-04-16 07:36:03.987");
+        m_DBHandler->registerOrUpdateEdgeNode("ABCD", true, "2021-08-27 09:19:00.000");
+        m_DBHandler->registerOrUpdateEdgeNode("EFGH", false, "2011-04-15 17:33:04.372");
+        m_DBHandler->registerOrUpdateEdgeNode("IJKL", true, "2016-04-16 07:36:03.987");
         Q_ASSERT(m_DBHandler->getEdgeNode(node, "IJKL"));
         Q_ASSERT(node.lastHeartbeat == "2016-04-16 07:36:03.987");
-        m_DBHandler->registerEdgeNode("IJKL", true, "2016-04-16 07:36:03.988");
+        m_DBHandler->registerOrUpdateEdgeNode("IJKL", true, "2016-04-16 07:36:03.988");
         Q_ASSERT(m_DBHandler->getEdgeNode(node, "IJKL"));
         Q_ASSERT(node.lastHeartbeat == "2016-04-16 07:36:03.988");
 

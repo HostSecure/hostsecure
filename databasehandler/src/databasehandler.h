@@ -19,7 +19,7 @@ public:
         bool isOnline = false;
         QString lastHeartbeat = "";
     };
-    void registerEdgeNode(const QString& macAddress, bool isOnline, const QString& lastHeartbeatTimestamp) const;
+    void registerOrUpdateEdgeNode(const QString& macAddress, bool isOnline, const QString& lastHeartbeatTimestamp) const;
     bool getEdgeNode(EdgeNode& edgeNode, const QString& macAddress) const;
     void getAllEdgeNodeKeys(QVector<QString>& macAddresses) const;
     void getAllEdgeNodes(std::vector<std::unique_ptr<EdgeNode>>& edgeNodes) const;
