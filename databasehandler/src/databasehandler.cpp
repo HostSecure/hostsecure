@@ -32,13 +32,13 @@ const QString DEVICE_STATUS_BLACKLISTED = "B";
 //const QString VENDORNAMETYPE = "VARCHAR(30)";
 }
 
-DatabaseHandler::DatabaseHandler(const QString& databasePath)
+DatabaseHandler::DatabaseHandler(const QString& a_databasePath)
 {
     //TODO: Handle differently, e.g. by using a SELECT call on some table to make it support other db types (e.g. MariaDB/MySQL)
-    bool exists = QFile::exists(databasePath);
+    bool exists = QFile::exists(a_databasePath);
     if(!exists)
     {
-        QDir dir = QFileInfo(databasePath).absoluteDir();
+        QDir dir = QFileInfo(a_databasePath).absoluteDir();
         if(!dir.exists())
         {
             if(!dir.mkpath(dir.absolutePath()))
@@ -50,7 +50,7 @@ DatabaseHandler::DatabaseHandler(const QString& databasePath)
     }
 
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName(databasePath);
+    db.setDatabaseName(a_databasePath);
 
     if(!db.open())
     {
@@ -111,15 +111,15 @@ DatabaseHandler::DatabaseHandler(const QString& databasePath)
     }
 }
 
-void DatabaseHandler::registerOrUpdateEdgeNode(const QString &macaddress, bool isOnline, const QString& lastHeartbeatTimestamp) const
+void DatabaseHandler::registerOrUpdateEdgeNode(const QString &a_macAddress, bool a_isOnline, const QString& a_lastHeartbeatTimestamp) const
 {
     QSqlQuery query;
     // NOT an UPSERT, but it's ok as we update every attribute of the table and we don't use an auto id.
     query.prepare("INSERT OR REPLACE INTO edgenode(macaddress, isonline, lastheartbeat)"
                   "VALUES(?, ?, ?)");
-    query.bindValue(0, macaddress);
-    query.bindValue(1, (isOnline ? 1 : 0));
-    query.bindValue(2, lastHeartbeatTimestamp);
+    query.bindValue(0, a_macAddress);
+    query.bindValue(1, (a_isOnline ? 1 : 0));
+    query.bindValue(2, a_lastHeartbeatTimestamp);
 
     if(!query.exec())
     {
@@ -128,20 +128,20 @@ void DatabaseHandler::registerOrUpdateEdgeNode(const QString &macaddress, bool i
     }
 }
 
-bool DatabaseHandler::getEdgeNode(EdgeNode &edgeNode, const QString &macAddress) const
+bool DatabaseHandler::getEdgeNode(EdgeNode &a_edgeNode, const QString &a_macAddress) const
 {
     bool success = false;
     QSqlQuery query;
     query.prepare("SELECT * FROM edgenode WHERE macaddress = ?");
-    query.bindValue(0, macAddress);
+    query.bindValue(0, a_macAddress);
 
     if(query.exec())
     {
         if(query.next())
         {
-            edgeNode.macAddress = query.value(0).toString();
-            edgeNode.isOnline = query.value(1).toBool();
-            edgeNode.lastHeartbeat = query.value(2).toString();
+            a_edgeNode.macAddress = query.value(0).toString();
+            a_edgeNode.isOnline = query.value(1).toBool();
+            a_edgeNode.lastHeartbeat = query.value(2).toString();
             success = true;
         }
     }
@@ -154,11 +154,11 @@ bool DatabaseHandler::getEdgeNode(EdgeNode &edgeNode, const QString &macAddress)
     return success;
 }
 
-void DatabaseHandler::getAllEdgeNodeKeys(QVector<QString> &macAddresses) const
+void DatabaseHandler::getAllEdgeNodeKeys(QVector<QString> &a_macAddresses) const
 {
     try
     {
-        getKeysFromTable("macaddress", "edgenode",  macAddresses);
+        getKeysFromTable("macaddress", "edgenode",  a_macAddresses);
     }
     catch(std::exception& e)
     {
@@ -167,7 +167,7 @@ void DatabaseHandler::getAllEdgeNodeKeys(QVector<QString> &macAddresses) const
     }
 }
 
-void DatabaseHandler::getAllEdgeNodes(std::vector<std::unique_ptr<EdgeNode> > &edgeNodes) const
+void DatabaseHandler::getAllEdgeNodes(std::vector<std::unique_ptr<EdgeNode> > &a_edgeNodes) const
 {
     QSqlQuery query;
     if(query.exec("SELECT * FROM edgenode"))
@@ -178,7 +178,7 @@ void DatabaseHandler::getAllEdgeNodes(std::vector<std::unique_ptr<EdgeNode> > &e
             node->macAddress = query.value(0).toString();
             node->isOnline = query.value(1).toBool();
             node->lastHeartbeat = query.value(2).toString();
-            edgeNodes.push_back(std::move(node));
+            a_edgeNodes.push_back(std::move(node));
         }
     }
     else
@@ -188,21 +188,21 @@ void DatabaseHandler::getAllEdgeNodes(std::vector<std::unique_ptr<EdgeNode> > &e
     }
 }
 
-void DatabaseHandler::setEdgeNodeOnlineStatus(const QString &macAddress, bool isOnline, const QString &lastHeartbeatTimestamp)
+void DatabaseHandler::setEdgeNodeOnlineStatus(const QString &a_macAddress, bool a_isOnline, const QString &a_lastHeartbeatTimestamp)
 {
     QSqlQuery query;
-    if(lastHeartbeatTimestamp.isEmpty())
+    if(a_lastHeartbeatTimestamp.isEmpty())
     {
         query.prepare("UPDATE edgenode SET isonline = ? WHERE macAddress = ?");
-        query.bindValue(0, (isOnline ? 1 : 0));
-        query.bindValue(1, macAddress);
+        query.bindValue(0, (a_isOnline ? 1 : 0));
+        query.bindValue(1, a_macAddress);
     }
     else
     {
         query.prepare("UPDATE edgenode SET isonline = ?, lastheartbeat = ? WHERE macAddress = ?");
-        query.bindValue(0, (isOnline ? 1 : 0));
-        query.bindValue(1, lastHeartbeatTimestamp);
-        query.bindValue(2, macAddress);
+        query.bindValue(0, (a_isOnline ? 1 : 0));
+        query.bindValue(1, a_lastHeartbeatTimestamp);
+        query.bindValue(2, a_macAddress);
     }
 
     if(!query.exec())
@@ -212,7 +212,7 @@ void DatabaseHandler::setEdgeNodeOnlineStatus(const QString &macAddress, bool is
     }
 }
 
-void DatabaseHandler::getOnlineEdgeNodes(QVector<QString> &macAddresses) const
+void DatabaseHandler::getOnlineEdgeNodes(QVector<QString> &a_macAddresses) const
 {
     QSqlQuery query;
 
@@ -220,7 +220,7 @@ void DatabaseHandler::getOnlineEdgeNodes(QVector<QString> &macAddresses) const
     {
         while (query.next())
         {
-           macAddresses.push_back( query.value(0).toString());
+           a_macAddresses.push_back( query.value(0).toString());
         }
     }
     else
@@ -230,7 +230,7 @@ void DatabaseHandler::getOnlineEdgeNodes(QVector<QString> &macAddresses) const
     }
 }
 
-void DatabaseHandler::registerDevice(const QString &productId, const QString &vendorId, const QString &serialNumber ) const
+void DatabaseHandler::registerDevice(const QString &a_productId, const QString &a_vendorId, const QString &a_serialNumber ) const
 {
     QSqlQuery query;
 
@@ -240,13 +240,13 @@ void DatabaseHandler::registerDevice(const QString &productId, const QString &ve
                   "WHERE NOT EXISTS(SELECT * "
                                    "FROM device "
                                    "WHERE productid = ? AND vendorid = ? AND serialnumber = ?)");
-    query.bindValue(0, productId);
-    query.bindValue(1, vendorId);
-    query.bindValue(2, serialNumber);
+    query.bindValue(0, a_productId);
+    query.bindValue(1, a_vendorId);
+    query.bindValue(2, a_serialNumber);
     query.bindValue(3, DEVICE_STATUS_UNKNOWN);
-    query.bindValue(4, productId);
-    query.bindValue(5, vendorId);
-    query.bindValue(6, serialNumber);
+    query.bindValue(4, a_productId);
+    query.bindValue(5, a_vendorId);
+    query.bindValue(6, a_serialNumber);
 
     if(!query.exec())
     {
@@ -255,22 +255,22 @@ void DatabaseHandler::registerDevice(const QString &productId, const QString &ve
     }
 }
 
-bool DatabaseHandler::getDevice(Device &device, const QString &productId, const QString &vendorId, const QString &serialNumber) const
+bool DatabaseHandler::getDevice(Device &a_device, const QString &a_productId, const QString &a_vendorId, const QString &a_serialNumber) const
 {
     bool success = false;
     QSqlQuery query;
     query.prepare("SELECT productid, vendorid, serialnumber FROM device WHERE productid = ? AND vendorid = ? AND serialnumber = ?");
-    query.bindValue(0, productId);
-    query.bindValue(1, vendorId);
-    query.bindValue(2, serialNumber);
+    query.bindValue(0, a_productId);
+    query.bindValue(1, a_vendorId);
+    query.bindValue(2, a_serialNumber);
 
     if(query.exec())
     {
         if(query.next())
         {
-            device.productId = query.value(0).toString();
-            device.vendorId = query.value(1).toString();
-            device.serialNumber = query.value(2).toString();
+            a_device.productId = query.value(0).toString();
+            a_device.vendorId = query.value(1).toString();
+            a_device.serialNumber = query.value(2).toString();
             success = true;
         }
     }
@@ -283,7 +283,7 @@ bool DatabaseHandler::getDevice(Device &device, const QString &productId, const 
     return success;
 }
 
-void DatabaseHandler::getAllDevices(std::vector<std::unique_ptr<Device> > &devices) const
+void DatabaseHandler::getAllDevices(std::vector<std::unique_ptr<Device> > &a_devices) const
 {
     QSqlQuery query;
     if(query.exec("SELECT productid, vendorid, serialnumber FROM device"))
@@ -294,7 +294,7 @@ void DatabaseHandler::getAllDevices(std::vector<std::unique_ptr<Device> > &devic
             device->productId = query.value(0).toString();
             device->vendorId = query.value(1).toString();
             device->serialNumber = query.value(2).toString();
-            devices.push_back(std::move(device));
+            a_devices.push_back(std::move(device));
         }
     }
     else
@@ -304,11 +304,11 @@ void DatabaseHandler::getAllDevices(std::vector<std::unique_ptr<Device> > &devic
     }
 }
 
-void DatabaseHandler::setDeviceBlacklisted(const QString& productId, const QString& vendorId, const QString& serialNumber) const
+void DatabaseHandler::setDeviceBlacklisted(const QString& a_productId, const QString& a_vendorId, const QString& a_serialNumber) const
 {
     try
     {
-        setDeviceStatus(productId, vendorId, serialNumber, DEVICE_STATUS_BLACKLISTED);
+        setDeviceStatus(a_productId, a_vendorId, a_serialNumber, DEVICE_STATUS_BLACKLISTED);
     }
     catch (std::exception& e)
     {
@@ -317,12 +317,12 @@ void DatabaseHandler::setDeviceBlacklisted(const QString& productId, const QStri
     }
 }
 
-bool DatabaseHandler::isDeviceBlackListed(const QString& productId, const QString& vendorId, const QString& serialNumber) const
+bool DatabaseHandler::isDeviceBlackListed(const QString& a_productId, const QString& a_vendorId, const QString& a_serialNumber) const
 {
     bool retVal = true; // Assume the worst
     try
     {
-        retVal = checkDeviceStatus(productId, vendorId, serialNumber, DEVICE_STATUS_BLACKLISTED);
+        retVal = checkDeviceStatus(a_productId, a_vendorId, a_serialNumber, DEVICE_STATUS_BLACKLISTED);
     }
     catch(std::exception& e)
     {
@@ -333,11 +333,11 @@ bool DatabaseHandler::isDeviceBlackListed(const QString& productId, const QStrin
     return retVal;
 }
 
-void DatabaseHandler::setDeviceWhitelisted(const QString& productId, const QString& vendorId, const QString& serialNumber) const
+void DatabaseHandler::setDeviceWhitelisted(const QString& a_productId, const QString& a_vendorId, const QString& a_serialNumber) const
 {
     try
     {
-        setDeviceStatus(productId, vendorId, serialNumber, DEVICE_STATUS_WHITELISTED);
+        setDeviceStatus(a_productId, a_vendorId, a_serialNumber, DEVICE_STATUS_WHITELISTED);
     }
     catch (std::exception& e)
     {
@@ -346,12 +346,12 @@ void DatabaseHandler::setDeviceWhitelisted(const QString& productId, const QStri
     }
 }
 
-bool DatabaseHandler::isDeviceWhiteListed(const QString& productId, const QString& vendorId, const QString& serialNumber) const
+bool DatabaseHandler::isDeviceWhiteListed(const QString& a_productId, const QString& a_vendorId, const QString& a_serialNumber) const
 {
     bool retVal = false;
     try
     {
-        retVal = checkDeviceStatus(productId, vendorId, serialNumber, DEVICE_STATUS_WHITELISTED);
+        retVal = checkDeviceStatus(a_productId, a_vendorId, a_serialNumber, DEVICE_STATUS_WHITELISTED);
     }
     catch(std::exception& e)
     {
@@ -362,18 +362,18 @@ bool DatabaseHandler::isDeviceWhiteListed(const QString& productId, const QStrin
     return retVal;
 }
 
-void DatabaseHandler::registerConnectedDevice(const QString &edgeNodeMacAddress, const QString &deviceProductId, const QString &deviceVendorId, const QString &deviceSerialNumber, const QString &timestamp)
+void DatabaseHandler::registerConnectedDevice(const QString &a_edgeNodeMacAddress, const QString &a_deviceProductId, const QString &a_deviceVendorId, const QString &a_deviceSerialNumber, const QString &a_timestamp)
 {
     QSqlQuery query;
     query.prepare("INSERT INTO connecteddevice(edgenodemacaddress, deviceid, connecttime) "
                   "SELECT ?, device.id, ? "
                   "FROM device "
                   "WHERE device.productid = ? AND device.vendorid = ? AND device.serialnumber = ?");
-    query.bindValue(0, edgeNodeMacAddress);
-    query.bindValue(1, timestamp);
-    query.bindValue(2, deviceProductId);
-    query.bindValue(3, deviceVendorId);
-    query.bindValue(4, deviceSerialNumber);
+    query.bindValue(0, a_edgeNodeMacAddress);
+    query.bindValue(1, a_timestamp);
+    query.bindValue(2, a_deviceProductId);
+    query.bindValue(3, a_deviceVendorId);
+    query.bindValue(4, a_deviceSerialNumber);
 
 //    "INSERT INTO log(edgenodemacaddress, deviceid, logtime, loginfo) "
 //                      "SELECT ?, device.id, ?, ? "
@@ -387,12 +387,12 @@ void DatabaseHandler::registerConnectedDevice(const QString &edgeNodeMacAddress,
     }
 }
 
-void DatabaseHandler::unregisterConnectedDevicesOnEdgeNode(const QString &edgeNodeMacAddress)
+void DatabaseHandler::unregisterConnectedDevicesOnEdgeNode(const QString &a_edgeNodeMacAddress)
 {
     QSqlQuery query;
     query.prepare("DELETE FROM connecteddevice "
                   "WHERE edgenodemacaddress = ?");
-    query.bindValue(0, edgeNodeMacAddress);
+    query.bindValue(0, a_edgeNodeMacAddress);
 
     if(!query.exec())
     {
@@ -401,15 +401,15 @@ void DatabaseHandler::unregisterConnectedDevicesOnEdgeNode(const QString &edgeNo
     }
 }
 
-void DatabaseHandler::unregisterConnectedDevice(const QString &edgeNodeMacAddress, const QString &deviceProductId, const QString &deviceVendorId, const QString &deviceSerialNumber)
+void DatabaseHandler::unregisterConnectedDevice(const QString &a_edgeNodeMacAddress, const QString &a_deviceProductId, const QString &a_deviceVendorId, const QString &a_deviceSerialNumber)
 {
     QSqlQuery query;
     query.prepare("DELETE FROM connecteddevice "
                   "WHERE edgenodemacaddress = ? AND deviceid = (SELECT id FROM device WHERE productid = ? AND vendorid = ? AND serialnumber = ?)");
-    query.bindValue(0, edgeNodeMacAddress);
-    query.bindValue(1, deviceProductId);
-    query.bindValue(2, deviceVendorId);
-    query.bindValue(3, deviceSerialNumber);
+    query.bindValue(0, a_edgeNodeMacAddress);
+    query.bindValue(1, a_deviceProductId);
+    query.bindValue(2, a_deviceVendorId);
+    query.bindValue(3, a_deviceSerialNumber);
 
     if(!query.exec())
     {
@@ -418,7 +418,7 @@ void DatabaseHandler::unregisterConnectedDevice(const QString &edgeNodeMacAddres
     }
 }
 
-void DatabaseHandler::getAllConnectedDevices(std::vector<std::unique_ptr<ConnectedDevice> > &connectedDevices)
+void DatabaseHandler::getAllConnectedDevices(std::vector<std::unique_ptr<ConnectedDevice> > &a_connectedDevices)
 {
     QSqlQuery query;
     if(query.exec("SELECT edgenodemacaddress, productid, vendorid, serialnumber "
@@ -432,7 +432,7 @@ void DatabaseHandler::getAllConnectedDevices(std::vector<std::unique_ptr<Connect
             connectedDevice->deviceProductId = query.value(1).toString();
             connectedDevice->deviceVendorId = query.value(2).toString();
             connectedDevice->deviceSerialNumber = query.value(3).toString();
-            connectedDevices.push_back(std::move(connectedDevice));
+            a_connectedDevices.push_back(std::move(connectedDevice));
         }
     }
     else
@@ -442,15 +442,15 @@ void DatabaseHandler::getAllConnectedDevices(std::vector<std::unique_ptr<Connect
     }
 }
 
-void DatabaseHandler::registerProductVendor(const QString &productId, const QString &productName, const QString &vendorId, const QString &vendorName)
+void DatabaseHandler::registerProductVendor(const QString &a_productId, const QString &a_productName, const QString &a_vendorId, const QString &a_vendorName)
 {
     QSqlQuery query;
     query.prepare("INSERT INTO productvendor(productid, vendorid, productname, vendorname)"
                   "VALUES(?, ?, ?, ?)");
-    query.bindValue(0, productId);
-    query.bindValue(1, vendorId);
-    query.bindValue(2, productName);
-    query.bindValue(3, vendorName);
+    query.bindValue(0, a_productId);
+    query.bindValue(1, a_vendorId);
+    query.bindValue(2, a_productName);
+    query.bindValue(3, a_vendorName);
 
     if(!query.exec())
     {
@@ -459,22 +459,22 @@ void DatabaseHandler::registerProductVendor(const QString &productId, const QStr
     }
 }
 
-bool DatabaseHandler::getProductVendor(ProductVendor& productVendor, const QString &productId, const QString vendorId)
+bool DatabaseHandler::getProductVendor(ProductVendor& a_productVendor, const QString &a_productId, const QString a_vendorId)
 {
     bool success = false;
     QSqlQuery query;
     query.prepare("SELECT * FROM productvendor WHERE productid = ? AND vendorid = ?");
-    query.bindValue(0, productId);
-    query.bindValue(1, vendorId);
+    query.bindValue(0, a_productId);
+    query.bindValue(1, a_vendorId);
 
     if(query.exec())
     {
         if(query.next())
         {
-            productVendor.productId = query.value(0).toString();
-            productVendor.vendorId = query.value(1).toString();
-            productVendor.productName = query.value(2).toString();
-            productVendor.vendorName = query.value(3).toString();
+            a_productVendor.productId = query.value(0).toString();
+            a_productVendor.vendorId = query.value(1).toString();
+            a_productVendor.productName = query.value(2).toString();
+            a_productVendor.vendorName = query.value(3).toString();
             success = true;
         }
     }
@@ -487,7 +487,7 @@ bool DatabaseHandler::getProductVendor(ProductVendor& productVendor, const QStri
     return success;
 }
 
-void DatabaseHandler::getAllProductVendors(std::vector<std::unique_ptr<ProductVendor> >& productVendors)
+void DatabaseHandler::getAllProductVendors(std::vector<std::unique_ptr<ProductVendor> >& a_productVendors)
 {
     QSqlQuery query;
     if(query.exec("SELECT * FROM productvendor"))
@@ -499,7 +499,7 @@ void DatabaseHandler::getAllProductVendors(std::vector<std::unique_ptr<ProductVe
             productVendor->vendorId = query.value(1).toString();
             productVendor->productName = query.value(2).toString();
             productVendor->vendorName = query.value(3).toString();
-            productVendors.push_back(std::move(productVendor));
+            a_productVendors.push_back(std::move(productVendor));
         }
     }
     else
@@ -509,13 +509,13 @@ void DatabaseHandler::getAllProductVendors(std::vector<std::unique_ptr<ProductVe
     }
 }
 
-void DatabaseHandler::registerVirusHash(const QString &virusHash, const QString &description)
+void DatabaseHandler::registerVirusHash(const QString &virusHash, const QString &a_description)
 {
     QSqlQuery query;
     query.prepare("INSERT INTO virushash(hashkey, description)"
                   "VALUES(?, ?)");
     query.bindValue(0, virusHash);
-    query.bindValue(1, description);
+    query.bindValue(1, a_description);
 
     if(!query.exec())
     {
@@ -524,19 +524,19 @@ void DatabaseHandler::registerVirusHash(const QString &virusHash, const QString 
     }
 }
 
-bool DatabaseHandler::getVirusHash(VirusHash &vHash, const QString &virusHash) const
+bool DatabaseHandler::getVirusHash(VirusHash &a_vHash, const QString &a_virusHash) const
 {
     bool success = false;
     QSqlQuery query;
     query.prepare("SELECT * FROM virushash WHERE hashkey = ?");
-    query.bindValue(0, virusHash);
+    query.bindValue(0, a_virusHash);
 
     if(query.exec())
     {
         if(query.next())
         {
-            vHash.virusHash = query.value(0).toString();
-            vHash.description = query.value(1).toString();
+            a_vHash.virusHash = query.value(0).toString();
+            a_vHash.description = query.value(1).toString();
             success = true;
         }
     }
@@ -549,11 +549,11 @@ bool DatabaseHandler::getVirusHash(VirusHash &vHash, const QString &virusHash) c
     return success;
 }
 
-void DatabaseHandler::getAllVirusHashKeys(QVector<QString> &virusHashes) const
+void DatabaseHandler::getAllVirusHashKeys(QVector<QString> &a_virusHashes) const
 {
     try
     {
-        getKeysFromTable("hashkey", "virushash",  virusHashes);
+        getKeysFromTable("hashkey", "virushash",  a_virusHashes);
     }
     catch(std::exception& e)
     {
@@ -562,7 +562,7 @@ void DatabaseHandler::getAllVirusHashKeys(QVector<QString> &virusHashes) const
     }
 }
 
-void DatabaseHandler::getAllVirusHashes(std::vector<std::unique_ptr<VirusHash> > &virusHashes) const
+void DatabaseHandler::getAllVirusHashes(std::vector<std::unique_ptr<VirusHash> > &a_virusHashes) const
 {
     QSqlQuery query;
     if(query.exec("SELECT * FROM virushash"))
@@ -572,7 +572,7 @@ void DatabaseHandler::getAllVirusHashes(std::vector<std::unique_ptr<VirusHash> >
             std::unique_ptr<VirusHash> virusHash =  std::make_unique<VirusHash>();
             virusHash->virusHash = query.value(0).toString();
             virusHash->description = query.value(1).toString();
-            virusHashes.push_back(std::move(virusHash));
+            a_virusHashes.push_back(std::move(virusHash));
         }
     }
     else
@@ -582,12 +582,12 @@ void DatabaseHandler::getAllVirusHashes(std::vector<std::unique_ptr<VirusHash> >
     }
 }
 
-bool DatabaseHandler::isHashInVirusDatabase(const QString &hash) const
+bool DatabaseHandler::isHashInVirusDatabase(const QString &a_hash) const
 {
     bool found = true; // Assume the worst
     QSqlQuery query;
     query.prepare("SELECT * FROM virushash WHERE hashkey = ?");
-    query.bindValue(0, hash);
+    query.bindValue(0, a_hash);
 
     if(query.exec())
     {
@@ -605,7 +605,7 @@ bool DatabaseHandler::isHashInVirusDatabase(const QString &hash) const
     return found;
 }
 
-void DatabaseHandler::logEvent(const QString& edgeNodeMacAddress, const QString& deviceProductId, const QString& deviceVendorId, const QString& deviceSerialNumber, const QString& timestamp, const QString& eventDescription)
+void DatabaseHandler::logEvent(const QString& edgeNodeMacAddress, const QString& a_deviceProductId, const QString& a_deviceVendorId, const QString& a_deviceSerialNumber, const QString& a_timestamp, const QString& a_eventDescription)
 {
     QSqlQuery query;
     query.prepare("INSERT INTO log(edgenodemacaddress, deviceid, logtime, loginfo) "
@@ -613,11 +613,11 @@ void DatabaseHandler::logEvent(const QString& edgeNodeMacAddress, const QString&
                   "FROM device "
                   "WHERE device.productid = ? AND device.vendorid = ? AND device.serialnumber = ?");
     query.bindValue(0, edgeNodeMacAddress);
-    query.bindValue(1, timestamp);
-    query.bindValue(2, eventDescription);
-    query.bindValue(3, deviceProductId);
-    query.bindValue(4, deviceVendorId);
-    query.bindValue(5, deviceSerialNumber);
+    query.bindValue(1, a_timestamp);
+    query.bindValue(2, a_eventDescription);
+    query.bindValue(3, a_deviceProductId);
+    query.bindValue(4, a_deviceVendorId);
+    query.bindValue(5, a_deviceSerialNumber);
 
     if(!query.exec())
     {
@@ -626,7 +626,7 @@ void DatabaseHandler::logEvent(const QString& edgeNodeMacAddress, const QString&
     }
 }
 
-bool DatabaseHandler::getLoggedEvent(LogEvent& logEvent, const QString& edgeNodeMacAddress, const QString& deviceProductId, const QString& deviceVendorId, const QString& deviceSerialNumber, const QString& timestamp) const
+bool DatabaseHandler::getLoggedEvent(LogEvent& logEvent, const QString& a_edgeNodeMacAddress, const QString& a_deviceProductId, const QString& a_deviceVendorId, const QString& a_deviceSerialNumber, const QString& a_timestamp) const
 {
     bool success = false;
     QSqlQuery query;
@@ -638,11 +638,11 @@ bool DatabaseHandler::getLoggedEvent(LogEvent& logEvent, const QString& edgeNode
                                     "FROM device "
                                     "WHERE productid = ? AND vendorid = ? AND serialnumber = ?) "
                     "AND logtime = ? ");
-    query.bindValue(0, edgeNodeMacAddress);
-    query.bindValue(1, deviceProductId);
-    query.bindValue(2, deviceVendorId);
-    query.bindValue(3, deviceSerialNumber);
-    query.bindValue(4, timestamp);
+    query.bindValue(0, a_edgeNodeMacAddress);
+    query.bindValue(1, a_deviceProductId);
+    query.bindValue(2, a_deviceVendorId);
+    query.bindValue(3, a_deviceSerialNumber);
+    query.bindValue(4, a_timestamp);
 
     if(query.exec())
     {
@@ -666,7 +666,7 @@ bool DatabaseHandler::getLoggedEvent(LogEvent& logEvent, const QString& edgeNode
     return success;
 }
 
-void DatabaseHandler::getAllLoggedEvents(std::vector<std::unique_ptr<LogEvent> >& loggedEvents) const
+void DatabaseHandler::getAllLoggedEvents(std::vector<std::unique_ptr<LogEvent> >& a_loggedEvents) const
 {
     QSqlQuery query;
     if(query.exec("SELECT edgenodemacaddress, productid, vendorid, serialnumber, logtime, loginfo "
@@ -682,7 +682,7 @@ void DatabaseHandler::getAllLoggedEvents(std::vector<std::unique_ptr<LogEvent> >
             logEvent->deviceSerialNumber = query.value(3).toString();
             logEvent->timestamp = query.value(4).toString();
             logEvent->eventDescription = query.value(5).toString();
-            loggedEvents.push_back(std::move(logEvent));
+            a_loggedEvents.push_back(std::move(logEvent));
         }
     }
     else
@@ -692,16 +692,16 @@ void DatabaseHandler::getAllLoggedEvents(std::vector<std::unique_ptr<LogEvent> >
     }
 }
 
-void DatabaseHandler::getKeysFromTable(const QString keyName, const QString &tableName, QVector<QString> &result) const
+void DatabaseHandler::getKeysFromTable(const QString a_keyName, const QString &a_tableName, QVector<QString> &a_result) const
 {
     QSqlQuery query;
-    query.prepare(QString("SELECT %1 FROM %2").arg(keyName, tableName));
+    query.prepare(QString("SELECT %1 FROM %2").arg(a_keyName, a_tableName));
 
     if(query.exec())
     {
         while (query.next())
         {
-           result.push_back( query.value(0).toString());
+           a_result.push_back( query.value(0).toString());
         }
     }
     else
@@ -710,14 +710,14 @@ void DatabaseHandler::getKeysFromTable(const QString keyName, const QString &tab
     }
 }
 
-void DatabaseHandler::setDeviceStatus(const QString& productId, const QString& vendorId, const QString& serialNumber, const QString& status) const
+void DatabaseHandler::setDeviceStatus(const QString& a_productId, const QString& a_vendorId, const QString& a_serialNumber, const QString& a_status) const
 {
     QSqlQuery query;
     query.prepare("UPDATE device SET status = ? WHERE productid = ? AND vendorid = ? AND serialnumber = ?");
-    query.bindValue(0, status);
-    query.bindValue(1, productId);
-    query.bindValue(2, vendorId);
-    query.bindValue(3, serialNumber);
+    query.bindValue(0, a_status);
+    query.bindValue(1, a_productId);
+    query.bindValue(2, a_vendorId);
+    query.bindValue(3, a_serialNumber);
 
     if(!query.exec())
     {
@@ -725,15 +725,15 @@ void DatabaseHandler::setDeviceStatus(const QString& productId, const QString& v
     }
 }
 
-bool DatabaseHandler::checkDeviceStatus(const QString& productId, const QString& vendorId, const QString& serialNumber, const QString& status) const
+bool DatabaseHandler::checkDeviceStatus(const QString& a_productId, const QString& a_vendorId, const QString& a_serialNumber, const QString& a_status) const
 {
     bool retVal = false;
     QSqlQuery query;
     query.prepare("SELECT * FROM device WHERE productId = ? AND vendorid = ? AND serialnumber = ? AND status = ?");
-    query.bindValue(0, productId);
-    query.bindValue(1, vendorId);
-    query.bindValue(2, serialNumber);
-    query.bindValue(3, status);
+    query.bindValue(0, a_productId);
+    query.bindValue(1, a_vendorId);
+    query.bindValue(2, a_serialNumber);
+    query.bindValue(3, a_status);
 
     if(query.exec())
     {

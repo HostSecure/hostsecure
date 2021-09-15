@@ -1,6 +1,4 @@
-#ifndef DATABASEMQTTCLIENT_H
-#define DATABASEMQTTCLIENT_H
-
+#pragma once
 #include <mqttclientbase.h>
 #include <msg/msgedge.h>
 #include <msg/msgdevice.h>
@@ -25,5 +23,3 @@ private:
    void brokerConnected() override;
    void incomingEdge( QMqttMessage a_sample );
 };
-
-#endif // DATABASEMQTTCLIENT_H

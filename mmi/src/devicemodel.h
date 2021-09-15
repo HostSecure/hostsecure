@@ -2,6 +2,10 @@
 #include <QAbstractListModel>
 #include <msg/msgdevice.h>
 
+//!
+//! \brief The DeviceModel class
+//! Exposes a set of devices to QML
+//!
 class DeviceModel : public QAbstractListModel
 {
    Q_OBJECT
@@ -27,7 +31,6 @@ public:
 
 private:
    Q_DISABLE_COPY_MOVE( DeviceModel )
-
    std::vector< MsgDevice > m_list;
 };
 

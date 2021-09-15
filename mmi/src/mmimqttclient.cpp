@@ -27,7 +27,6 @@ void MmiMqttClient::incomingEdge( QMqttMessage a_sample )
    const auto levels = a_sample.topic().levels();
 
    qInfo() << "Message rc: " << a_sample.topic().name() << "\n" << a_sample.payload();
-   qInfo() << "Size: " << levelCount;
    qInfo() << "Levels: " << levels;
 
    if ( levelCount >= 2 )

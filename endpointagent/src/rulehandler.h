@@ -3,8 +3,8 @@
 
 class RuleHandler : public QObject
 {
-    Q_OBJECT
+   Q_OBJECT
 public:
-    RuleHandler();
+   RuleHandler();
 };
 

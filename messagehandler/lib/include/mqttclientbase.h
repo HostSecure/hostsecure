@@ -34,15 +34,5 @@ protected:
 
 private:
    Q_DISABLE_COPY_MOVE( MqttClientBase )
-
-   struct Broker
-   {
-      QString address;    //! Server hostname
-      quint16 port;       //! Server port
-      quint8 qos;         //! Quality of Service
-      bool retain;        //! Retain message
-      quint8 heartbeat;   //! Ping response (seconds)
-   };
-   const Broker m_broker;
 };
 

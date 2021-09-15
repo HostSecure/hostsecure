@@ -1,6 +1,4 @@
-#ifndef DATABASEMANAGER_H
-#define DATABASEMANAGER_H
-
+#pragma once
 #include <QObject>
 
 class MsgEdge;
@@ -11,20 +9,16 @@ class DatabaseManager : public QObject
 {
     Q_OBJECT
 public:
-    explicit DatabaseManager(const QString& databaseName, QObject *parent = nullptr);
-
-signals:
+    explicit DatabaseManager( const QString& a_databaseName, QObject* a_parent = nullptr );
 
 private slots:
-    void edgeChanged( const QString& edgeId, const MsgEdge& sample );
-    void edgeRemoved( const QString& edgeId );
+    void edgeChanged( const QString& a_edgeId, const MsgEdge& a_sample );
+    void edgeRemoved( const QString& a_edgeId );
 
-    void deviceChanged( const QString& edgeId, const QString& deviceId, const MsgDevice& sample );
-    void deviceRemoved( const QString& edgeId, const QString& deviceId, const QString& deviceSerial );
+    void deviceChanged( const QString& a_edgeId, const QString& a_deviceId, const MsgDevice& a_sample );
+    void deviceRemoved( const QString& a_edgeId, const QString& a_deviceId, const QString& a_deviceSerial );
 
 private:
     std::shared_ptr<DatabaseHandler> m_DatabaseHandler;
     std::shared_ptr<DatabaseMqttClient> m_MqttCient;
 };
-
-#endif // DATABASEMANAGER_H

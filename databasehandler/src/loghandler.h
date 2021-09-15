@@ -1,6 +1,4 @@
-#ifndef LOGHANDLER_H
-#define LOGHANDLER_H
-
+#pragma once
 class QFile;
 
 class LogHandler
@@ -12,5 +10,3 @@ private:
     LogHandler();
     ~LogHandler();
 };
-
-#endif // LOGHANDLER_H

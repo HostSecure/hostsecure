@@ -1,6 +1,4 @@
-#ifndef DATABASEHANDLER_H
-#define DATABASEHANDLER_H
-
+#pragma once
 #include <QString>
 
 class QSqlQuery;
@@ -8,7 +6,7 @@ class QSqlQuery;
 class DatabaseHandler
 {
 public:
-    DatabaseHandler(const QString& databasePath);
+    DatabaseHandler( const QString& a_databasePath );
 
     // All functions should be assumed to throw std::exceptions upon failure
 
@@ -19,12 +17,12 @@ public:
         bool isOnline = false;
         QString lastHeartbeat = "";
     };
-    void registerOrUpdateEdgeNode(const QString& macAddress, bool isOnline, const QString& lastHeartbeatTimestamp) const;
-    bool getEdgeNode(EdgeNode& edgeNode, const QString& macAddress) const;
-    void getAllEdgeNodeKeys(QVector<QString>& macAddresses) const;
-    void getAllEdgeNodes(std::vector<std::unique_ptr<EdgeNode>>& edgeNodes) const;
-    void setEdgeNodeOnlineStatus(const QString& macAddress, bool isOnline, const QString& lastHeartbeatTimestamp = "");
-    void getOnlineEdgeNodes(QVector<QString>& macAddresses) const;
+    void registerOrUpdateEdgeNode(const QString& a_macAddress, bool a_isOnline, const QString& a_lastHeartbeatTimestamp) const;
+    bool getEdgeNode(EdgeNode& a_edgeNode, const QString& a_macAddress) const;
+    void getAllEdgeNodeKeys(QVector<QString>& a_macAddresses) const;
+    void getAllEdgeNodes(std::vector<std::unique_ptr<EdgeNode>>& a_edgeNodes) const;
+    void setEdgeNodeOnlineStatus(const QString& a_macAddress, bool a_isOnline, const QString& a_lastHeartbeatTimestamp = "");
+    void getOnlineEdgeNodes(QVector<QString>& a_macAddresses) const;
 
     //Device
     struct Device
@@ -33,13 +31,13 @@ public:
         QString productId = "";
         QString serialNumber = "";
     };
-    void registerDevice(const QString& productId, const QString& vendorId, const QString& serialNumber) const;
-    bool getDevice(Device& device, const QString& productId, const QString& vendorId, const QString& serialNumber) const;
-    void getAllDevices(std::vector<std::unique_ptr<Device>>& devices) const;
-    void setDeviceBlacklisted(const QString& productId, const QString& vendorId, const QString& serialNumber) const;
-    bool isDeviceBlackListed(const QString& productId, const QString& vendorId, const QString& serialNumber) const;
-    void setDeviceWhitelisted(const QString& productId, const QString& vendorId, const QString& serialNumber) const;
-    bool isDeviceWhiteListed(const QString& productId, const QString& vendorId, const QString& serialNumber) const;
+    void registerDevice(const QString& a_productId, const QString& a_vendorId, const QString& a_serialNumber) const;
+    bool getDevice(Device& a_device, const QString& a_productId, const QString& a_vendorId, const QString& a_serialNumber) const;
+    void getAllDevices(std::vector<std::unique_ptr<Device>>& a_devices) const;
+    void setDeviceBlacklisted(const QString& a_productId, const QString& a_vendorId, const QString& a_serialNumber) const;
+    bool isDeviceBlackListed(const QString& a_productId, const QString& a_vendorId, const QString& a_serialNumber) const;
+    void setDeviceWhitelisted(const QString& a_productId, const QString& a_vendorId, const QString& a_serialNumber) const;
+    bool isDeviceWhiteListed(const QString& a_productId, const QString& a_vendorId, const QString& a_serialNumber) const;
 
     // Connected devices
     struct ConnectedDevice
@@ -49,10 +47,10 @@ public:
         QString deviceVendorId = "";
         QString deviceSerialNumber = "";
     };
-    void registerConnectedDevice(const QString& edgeNodeMacAddress, const QString& deviceProductId, const QString& deviceVendorId, const QString& deviceSerialNumber, const QString& timestamp);
-    void unregisterConnectedDevicesOnEdgeNode(const QString& edgeNodeMacAddress);
-    void unregisterConnectedDevice(const QString& edgeNodeMacAddress, const QString& deviceProductId, const QString& deviceVendorId, const QString& deviceSerialNumber);
-    void getAllConnectedDevices(std::vector<std::unique_ptr<ConnectedDevice>>& connectedDevices);
+    void registerConnectedDevice(const QString& a_edgeNodeMacAddress, const QString& a_deviceProductId, const QString& a_deviceVendorId, const QString& a_deviceSerialNumber, const QString& a_timestamp);
+    void unregisterConnectedDevicesOnEdgeNode(const QString& a_edgeNodeMacAddress);
+    void unregisterConnectedDevice(const QString& a_edgeNodeMacAddress, const QString& a_deviceProductId, const QString& a_deviceVendorId, const QString& a_deviceSerialNumber);
+    void getAllConnectedDevices(std::vector<std::unique_ptr<ConnectedDevice>>& a_connectedDevices);
 
 
     // ProductVendor
@@ -63,9 +61,9 @@ public:
         QString vendorId = "";
         QString vendorName = "";
     };
-    void registerProductVendor(const QString& productId, const QString& productName, const QString& vendorId, const QString& vendorName);
-    bool getProductVendor(ProductVendor& productVendor, const QString& productId, const QString vendorId);
-    void getAllProductVendors(std::vector<std::unique_ptr<ProductVendor>>& productVendors);
+    void registerProductVendor(const QString& a_productId, const QString& a_productName, const QString& a_vendorId, const QString& a_vendorName);
+    bool getProductVendor(ProductVendor& a_productVendor, const QString& a_productId, const QString a_vendorId);
+    void getAllProductVendors(std::vector<std::unique_ptr<ProductVendor>>& a_productVendors);
 
     // Virus
     struct VirusHash
@@ -73,11 +71,11 @@ public:
         QString virusHash = "";
         QString description = "";
     };
-    void registerVirusHash(const QString& virusHash, const QString& description);
-    bool getVirusHash(VirusHash& vHash, const QString& virusHash) const;
-    void getAllVirusHashKeys(QVector<QString>& virusHashes) const;
-    void getAllVirusHashes(std::vector<std::unique_ptr<VirusHash>>& virusHashes) const ;
-    bool isHashInVirusDatabase(const QString& hash) const;
+    void registerVirusHash(const QString& a_virusHash, const QString& a_description);
+    bool getVirusHash(VirusHash& a_vHash, const QString& a_virusHash) const;
+    void getAllVirusHashKeys(QVector<QString>& a_virusHashes) const;
+    void getAllVirusHashes(std::vector<std::unique_ptr<VirusHash>>& a_virusHashes) const ;
+    bool isHashInVirusDatabase(const QString& a_hash) const;
 
     // Event logging
     struct LogEvent
@@ -89,14 +87,12 @@ public:
         QString timestamp = "";
         QString eventDescription = "";
     };
-    void logEvent(const QString& edgeNodeMacAddress, const QString& deviceProductId, const QString& deviceVendorId, const QString& deviceSerialNumber, const QString& timestamp, const QString& eventDescription);
-    bool getLoggedEvent(LogEvent& logEvent, const QString& edgeNodeMacAddress, const QString& deviceProductId, const QString& deviceVendorId, const QString& deviceSerialNumber, const QString& timestamp) const;
-    void getAllLoggedEvents(std::vector<std::unique_ptr<LogEvent>>& loggedEvents) const;
+    void logEvent(const QString& a_edgeNodeMacAddress, const QString& a_deviceProductId, const QString& a_deviceVendorId, const QString& a_deviceSerialNumber, const QString& a_timestamp, const QString& a_eventDescription);
+    bool getLoggedEvent(LogEvent& a_logEvent, const QString& a_edgeNodeMacAddress, const QString& a_deviceProductId, const QString& a_deviceVendorId, const QString& a_deviceSerialNumber, const QString& a_timestamp) const;
+    void getAllLoggedEvents(std::vector<std::unique_ptr<LogEvent>>& a_loggedEvents) const;
 
 private:
-    void getKeysFromTable(const QString keyName, const QString& tableName, QVector<QString>& result) const;
-    void setDeviceStatus(const QString& productId, const QString& vendorId, const QString& serialNumber, const QString& status) const;
-    bool checkDeviceStatus(const QString& productId, const QString& vendorId, const QString& serialNumber, const QString& status) const;
+    void getKeysFromTable(const QString a_keyName, const QString& a_tableName, QVector<QString>& a_result) const;
+    void setDeviceStatus(const QString& a_productId, const QString& a_vendorId, const QString& a_serialNumber, const QString& a_status) const;
+    bool checkDeviceStatus(const QString& a_productId, const QString& a_vendorId, const QString& a_serialNumber, const QString& a_status) const;
 };
-
-#endif // DATABASEHANDLER_H

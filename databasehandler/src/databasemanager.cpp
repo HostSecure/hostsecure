@@ -5,10 +5,10 @@
 
 #include <QTime>
 
-DatabaseManager::DatabaseManager(const QString &databaseName, QObject *parent)
-    : QObject(parent)
-    , m_DatabaseHandler(new DatabaseHandler(databaseName))
-    , m_MqttCient(new DatabaseMqttClient(parent))
+DatabaseManager::DatabaseManager(const QString &a_databaseName, QObject *a_parent)
+    : QObject(a_parent)
+    , m_DatabaseHandler(new DatabaseHandler(a_databaseName))
+    , m_MqttCient(new DatabaseMqttClient(a_parent))
 {
     connect( m_MqttCient.get(), &DatabaseMqttClient::edgeChanged, this, &DatabaseManager::edgeChanged );
     connect( m_MqttCient.get(), &DatabaseMqttClient::edgeRemoved, this, &DatabaseManager::edgeRemoved );
@@ -16,11 +16,11 @@ DatabaseManager::DatabaseManager(const QString &databaseName, QObject *parent)
     connect( m_MqttCient.get(), &DatabaseMqttClient::deviceRemoved, this, &DatabaseManager::deviceRemoved );
 }
 
-void DatabaseManager::edgeChanged(const QString &edgeId, const MsgEdge &sample)
+void DatabaseManager::edgeChanged(const QString &a_edgeId, const MsgEdge &a_sample)
 {
     try
     {
-        m_DatabaseHandler->registerOrUpdateEdgeNode(edgeId, sample.isOnline, QDateTime::currentDateTimeUtc().toString());
+        m_DatabaseHandler->registerOrUpdateEdgeNode(a_edgeId, a_sample.isOnline, QDateTime::currentDateTimeUtc().toString());
     }
     catch (std::exception& e)
     {
@@ -28,12 +28,12 @@ void DatabaseManager::edgeChanged(const QString &edgeId, const MsgEdge &sample)
     }
 }
 
-void DatabaseManager::edgeRemoved(const QString &edgeId)
+void DatabaseManager::edgeRemoved(const QString &a_edgeId)
 {
     try
     {
-        m_DatabaseHandler->setEdgeNodeOnlineStatus(edgeId, false);
-        m_DatabaseHandler->unregisterConnectedDevicesOnEdgeNode(edgeId);
+        m_DatabaseHandler->setEdgeNodeOnlineStatus(a_edgeId, false);
+        m_DatabaseHandler->unregisterConnectedDevicesOnEdgeNode(a_edgeId);
     }
     catch (std::exception& e)
     {
@@ -41,20 +41,20 @@ void DatabaseManager::edgeRemoved(const QString &edgeId)
     }
 }
 
-void DatabaseManager::deviceChanged(const QString &edgeId, const QString &deviceId, const MsgDevice &sample)
+void DatabaseManager::deviceChanged(const QString &a_edgeId, const QString &a_deviceId, const MsgDevice &a_sample)
 {
-    QStringList vendorProductIds = deviceId.split(":");
+    QStringList vendorProductIds = a_deviceId.split(":");
     if(vendorProductIds.size() != 2)
     {
-        qCritical() << "Received device changed with unrecognizable deviceid: " << deviceId;
+        qCritical() << "Received device changed with unrecognizable deviceid: " << a_deviceId;
     }
     else
     {
         try
         {
-            m_DatabaseHandler->registerDevice(vendorProductIds[1], vendorProductIds[0], sample.deviceSerial);
-            m_DatabaseHandler->registerConnectedDevice(edgeId, vendorProductIds[1], vendorProductIds[0], sample.deviceSerial, sample.lastHeartBeat);
-            m_DatabaseHandler->logEvent(edgeId, vendorProductIds[1], vendorProductIds[0], sample.deviceSerial, QDateTime::currentDateTimeUtc().toString(), "Device connected");
+            m_DatabaseHandler->registerDevice(vendorProductIds[1], vendorProductIds[0], a_sample.deviceSerial);
+            m_DatabaseHandler->registerConnectedDevice(a_edgeId, vendorProductIds[1], vendorProductIds[0], a_sample.deviceSerial, a_sample.lastHeartBeat);
+            m_DatabaseHandler->logEvent(a_edgeId, vendorProductIds[1], vendorProductIds[0], a_sample.deviceSerial, QDateTime::currentDateTimeUtc().toString(), "Device connected");
         }
         catch (std::exception& e)
         {
@@ -63,19 +63,19 @@ void DatabaseManager::deviceChanged(const QString &edgeId, const QString &device
     }
 }
 
-void DatabaseManager::deviceRemoved(const QString &edgeId, const QString &deviceId, const QString& deviceSerial)
+void DatabaseManager::deviceRemoved(const QString &a_edgeId, const QString &a_deviceId, const QString& a_deviceSerial)
 {
-    QStringList vendorProductIds = deviceId.split(":");
+    QStringList vendorProductIds = a_deviceId.split(":");
     if(vendorProductIds.size() != 2)
     {
-        qCritical() << "Received device removed with unrecognizable deviceid: " << deviceId;
+        qCritical() << "Received device removed with unrecognizable deviceid: " << a_deviceId;
     }
     else
     {
         try
         {
-            m_DatabaseHandler->unregisterConnectedDevice(edgeId, vendorProductIds[1], vendorProductIds[0], deviceSerial);
-            m_DatabaseHandler->logEvent(edgeId, vendorProductIds[1], vendorProductIds[0], deviceSerial, QDateTime::currentDateTimeUtc().toString(), "Device disconnected");
+            m_DatabaseHandler->unregisterConnectedDevice(a_edgeId, vendorProductIds[1], vendorProductIds[0], a_deviceSerial);
+            m_DatabaseHandler->logEvent(a_edgeId, vendorProductIds[1], vendorProductIds[0], a_deviceSerial, QDateTime::currentDateTimeUtc().toString(), "Device disconnected");
         }
         catch (std::exception& e)
         {

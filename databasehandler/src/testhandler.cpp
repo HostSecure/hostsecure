@@ -12,14 +12,14 @@
 // This is to make testing more predictable and simpler to code,
 // decreasing the complexity and the potential of bugs in the test code
 
-TestHandler::TestHandler(const QString &databasePath)
+TestHandler::TestHandler(const QString &a_databasePath)
 {
-    QFile file(databasePath);
+    QFile file(a_databasePath);
     if(file.exists())
     {
         file.remove();
     }
-    m_DBHandler = new DatabaseHandler(databasePath);
+    m_DBHandler = new DatabaseHandler(a_databasePath);
 }
 
 void TestHandler::testCaseEdgeNode()
@@ -138,14 +138,14 @@ void TestHandler::testCaseProductVendor()
     }
 }
 
-void TestHandler::testCaseDevice(bool requiredDataExists)
+void TestHandler::testCaseDevice(bool a_requiredDataExists)
 {
     try
     {
         QSqlQuery query;
         query.exec("DELETE FROM device");
 
-        if(!requiredDataExists)
+        if(!a_requiredDataExists)
         {
             testCaseProductVendor();
         }
@@ -194,14 +194,14 @@ void TestHandler::testCaseDevice(bool requiredDataExists)
     }
 }
 
-void TestHandler::testCaseConnectedDevice(bool requiredDataExists)
+void TestHandler::testCaseConnectedDevice(bool a_requiredDataExists)
 {
     try
     {
         QSqlQuery query;
         query.exec("DELETE FROM connecteddevice");
 
-        if(!requiredDataExists)
+        if(!a_requiredDataExists)
         {
             testCaseEdgeNode();
             testCaseDevice(false);
@@ -212,7 +212,7 @@ void TestHandler::testCaseConnectedDevice(bool requiredDataExists)
 
         m_DBHandler->getAllEdgeNodeKeys(edgeKeys);
         m_DBHandler->getAllDevices(devices);
-        Q_ASSERT(edgeKeys.size() == devices.size());
+        Q_ASSERT(edgeKeys.size() == static_cast< qsizetype >( devices.size() ));
         Q_ASSERT(edgeKeys.size() == 3);
 
         for(int i = 0; i < edgeKeys.size(); ++i)
@@ -246,14 +246,14 @@ void TestHandler::testCaseConnectedDevice(bool requiredDataExists)
     }
 }
 
-void TestHandler::testCaseLog(bool requiredDataExists)
+void TestHandler::testCaseLog(bool a_requiredDataExists)
 {
     try
     {
         QSqlQuery query;
         query.exec("DELETE FROM log");
 
-        if(!requiredDataExists)
+        if(!a_requiredDataExists)
         {
             testCaseEdgeNode();
             testCaseDevice(false);
@@ -264,7 +264,7 @@ void TestHandler::testCaseLog(bool requiredDataExists)
 
         m_DBHandler->getAllEdgeNodeKeys(edgeKeys);
         m_DBHandler->getAllDevices(devices);
-        Q_ASSERT(edgeKeys.size() == devices.size());
+        Q_ASSERT(edgeKeys.size() == static_cast< qsizetype >( devices.size() ) );
         Q_ASSERT(edgeKeys.size() == 3);
 
         for(int i = 0; i < edgeKeys.size(); ++i)
@@ -299,11 +299,11 @@ void TestHandler::testCaseAll()
     testCaseLog(true);
 }
 
-bool TestHandler::checkString(const QString &query, const QString &target1, const QString &target2, const QString &target3)
+bool TestHandler::checkString(const QString &a_query, const QString &a_target1, const QString &a_target2, const QString &a_target3)
 {
-    if((query == target1) ||
-        (query == target2) ||
-        (query == target3))
+    if((a_query == a_target1) ||
+        (a_query == a_target2) ||
+        (a_query == a_target3))
     {
         return true;
     }

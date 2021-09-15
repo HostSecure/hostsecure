@@ -16,11 +16,6 @@ class HostSecureCollection : public QObject
 public:
    explicit HostSecureCollection( QObject* a_parent = nullptr );
 
-public slots:
-   void incrementEdgeId();
-   void sendEdgeMessage();
-   void sendDeviceMessage();
-
 private:
    Q_DISABLE_COPY_MOVE( HostSecureCollection )
 

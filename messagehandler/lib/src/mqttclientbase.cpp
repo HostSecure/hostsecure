@@ -4,16 +4,12 @@
 
 namespace
 {
-//   constexpr auto MQTT_ADDRESS = "localhost";
-//   constexpr auto MQTT_PORT = 1883;
-
    constexpr auto MQTT_ADDRESS = "92.220.65.49";
    constexpr auto MQTT_PORT = 1883;
 }
 
 MqttClientBase::MqttClientBase( QObject* a_parent )
    : QMqttClient { a_parent }
-   , m_broker { MQTT_ADDRESS, MQTT_PORT, 0, true, 60 }
 {
    qDebug() << "MQTT protocol version:" << protocolVersion();
    QObject::connect( this, &QMqttClient::connected, this, &MqttClientBase::brokerConnected );
@@ -21,8 +17,8 @@ MqttClientBase::MqttClientBase( QObject* a_parent )
    QObject::connect( this, &QMqttClient::stateChanged, this, &MqttClientBase::stateStringChanged );
    QObject::connect( this, &QMqttClient::errorChanged, this, &MqttClientBase::errorStringChanged );
 
-   setHostname( m_broker.address );
-   setPort( m_broker.port );
+   setHostname( MQTT_ADDRESS );
+   setPort( MQTT_PORT );
    connectToHost();
 }
 

@@ -34,8 +34,6 @@ Pane {
                      icon.color: rootItem.enabled ? Material.foreground : Material.hintTextColor
                      icon.height: 30
                      icon.width: 30
-                     //                     Layout.preferredHeight: 30
-                     //                     Layout.preferredWidth: 30
                   }
                   Label {
                      text: model.id

@@ -1,39 +1,37 @@
 #pragma once
-
 #include <QObject>
 #include <QtDBus>
 #include <QMap>
 #include <QString>
+#include "uplinkhandler.h"
 
-class UplinkHandler;
 class ServiceHandler : public QObject
 {
-    Q_OBJECT
+   Q_OBJECT
 public:
-    explicit ServiceHandler(QObject *parent = nullptr);
-    ~ServiceHandler();
+   explicit ServiceHandler(QObject* a_parent = nullptr);
 
-    void listRules(const QString& label); // out a(us) ruleset
-    void removeRule(const uint id); // out
-    void listDevices(const QString& query); // out a(us) devices
+   void listRules(const QString& a_label); // out a(us) ruleset
+   void removeRule(const uint a_id); // out
+   void listDevices(const QString& a_query); // out a(us) devices
 
 signals:
-    void devicePresenceUpdate(QString device_id, QString device_serial,
+   void devicePresenceUpdate(QString device_id, QString device_serial,
                              uint target, QString interface, uint event);
 
-    void devicePolicyUpdate(QString device_id, QString device_serial,
-                             uint target, QString interface);
+   void devicePolicyUpdate(QString device_id, QString device_serial,
+                           uint target, QString interface);
 
 public slots:
-    void handleDevicePresenceChanged(const uint id, const uint event, const uint target, const QString& device_rule,
-                               const QMap<QString, QString>& attributes);
-    void handleDevicePolicyChanged(const uint id, const uint target_old, const uint target_new, const QString& device_rule, const uint rule_id,
-                             const QMap<QString, QString>& attributes);
-    void appendRule(const QString& device_id, const QString& device_serial, const uint target, const QString& interface);
+   void handleDevicePresenceChanged(const uint a_id, const uint a_event, const uint a_target, const QString& a_device_rule,
+                                    const QMap<QString, QString>& a_attributes);
+   void handleDevicePolicyChanged(const uint a_id, const uint a_target_old, const uint a_target_new, const QString& a_device_rule, const uint a_rule_id,
+                                  const QMap<QString, QString>& a_attributes);
+   void appendRule(const QString& a_device_id, const QString& a_device_serial, const uint a_target, const QString& a_interface);
 
 private:
-    QDBusInterface *m_ifaceUSBGuardDevices;
-    QDBusInterface *m_ifaceUSBGuardPolicy;
-    std::unique_ptr<UplinkHandler> m_uplinkHandler;
+   QDBusInterface* m_ifaceUSBGuardDevices { nullptr };
+   QDBusInterface* m_ifaceUSBGuardPolicy { nullptr };
+   std::unique_ptr<UplinkHandler> m_uplinkHandler;
 };
 

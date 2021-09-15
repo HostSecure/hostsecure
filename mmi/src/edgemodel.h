@@ -4,6 +4,10 @@
 #include <msg/msgedge.h>
 #include <msg/msgdevice.h>
 
+//!
+//! \brief The EdgeModel class
+//! Exposes a set of edges to QML
+//!
 class EdgeModel : public QAbstractListModel
 {
    Q_OBJECT
@@ -35,6 +39,5 @@ private:
       MsgEdge edge;
       DeviceModel* deviceModel { nullptr };
    };
-
    std::vector< Data > m_list;
 };
