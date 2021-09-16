@@ -34,5 +34,5 @@ jobs:
           mkdir build
           cd build
           qmake ..
-          qmake --build .
+          make
           
