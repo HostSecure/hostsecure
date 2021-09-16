@@ -11,7 +11,7 @@ namespace
       QString mac = "";
       for( const QNetworkInterface& interface : QNetworkInterface::allInterfaces() )
       {
-         if(interface.type() == QNetworkInterface::InterfaceType::Wifi )
+         if( !( interface.flags() & QNetworkInterface::IsLoopBack ) )
          {
             mac = interface.hardwareAddress();
          }
