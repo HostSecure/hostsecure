@@ -1,15 +1,22 @@
 #include "mmimqttclient.h"
 #include <QJsonDocument>
 
-
+//!
+//! \brief MmiMqttClient::MmiMqttClient
+//! \param a_parent
+//!
 MmiMqttClient::MmiMqttClient( QObject* a_parent )
    : MqttClientBase { a_parent }
 {
+   connectToHost();
 }
 
+//!
+//! \brief MmiMqttClient::brokerConnected
+//!
 void MmiMqttClient::brokerConnected()
 {
-   qInfo() << "Broker connected!";
+   qDebug() << "Broker connected!";
 
    const QMqttTopicFilter topicFilter( "edges/#" ); //! Subscribe with wildcard
    auto edgeSub = subscribe( topicFilter );
@@ -20,14 +27,18 @@ void MmiMqttClient::brokerConnected()
    }
 }
 
+//!
+//! \brief MmiMqttClient::incomingEdge
+//! \param a_sample
+//!
 void MmiMqttClient::incomingEdge( QMqttMessage a_sample )
 {
    QJsonDocument document = QJsonDocument::fromJson( a_sample.payload() );
    const auto levelCount = a_sample.topic().levelCount();
    const auto levels = a_sample.topic().levels();
 
-   qInfo() << "Message rc: " << a_sample.topic().name() << "\n" << a_sample.payload();
-   qInfo() << "Levels: " << levels;
+   qDebug() << "Message rc: " << a_sample.topic().name() << "\n" << a_sample.payload();
+   qDebug() << "Levels: " << levels;
 
    if ( levelCount >= 2 )
    {

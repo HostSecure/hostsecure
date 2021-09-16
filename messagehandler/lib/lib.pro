@@ -5,6 +5,11 @@ TARGET = messagehandler
 TEMPLATE = lib
 CONFIG += staticlib c++2a
 
+# If release build
+CONFIG(release, debug|release) {
+    DEFINES += QT_NO_DEBUG_OUTPUT
+}
+
 INCLUDEPATH += include
 
 SOURCES += \

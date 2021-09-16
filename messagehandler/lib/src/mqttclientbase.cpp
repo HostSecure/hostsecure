@@ -5,6 +5,7 @@
 namespace
 {
    constexpr auto MQTT_ADDRESS = "92.220.65.49";
+//   constexpr auto MQTT_ADDRESS = "localhost";
    constexpr auto MQTT_PORT = 1883;
 }
 
@@ -19,7 +20,6 @@ MqttClientBase::MqttClientBase( QObject* a_parent )
 
    setHostname( MQTT_ADDRESS );
    setPort( MQTT_PORT );
-   connectToHost();
 }
 
 qint32 MqttClientBase::publish( const QMqttTopicName& a_topic,
@@ -42,7 +42,7 @@ qint32 MqttClientBase::publish( const QMqttTopicName& a_topic,
 
 QString MqttClientBase::protocolVersionString() const
 {
-   return QMetaEnum::fromType< QMqttClient::ClientState >().valueToKey( protocolVersion() );
+   return QMetaEnum::fromType< QMqttClient::ProtocolVersion >().valueToKey( protocolVersion() );
 }
 
 QString MqttClientBase::stateString() const

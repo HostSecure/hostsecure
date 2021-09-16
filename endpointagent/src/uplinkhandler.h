@@ -21,7 +21,7 @@ public slots:
 
 private:
    void brokerConnected() override;
-   QString fetchMac();
    QString m_hardwareAddress;
+   QString m_hardwareAddressTopic;
 };
 

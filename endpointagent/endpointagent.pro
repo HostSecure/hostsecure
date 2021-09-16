@@ -4,6 +4,11 @@ QT += dbus network mqtt
 CONFIG += c++2a
 CONFIG -= app_bundle
 
+# If release build
+CONFIG(release, debug|release) {
+    DEFINES += QT_NO_DEBUG_OUTPUT
+}
+
 #DBUS_ADAPTORS += DBusInterface.xml
 #DBUS_INTERFACES += DBusInterface.xml
 

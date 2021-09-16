@@ -4,6 +4,11 @@ QT += sql mqtt
 CONFIG += c++2a
 CONFIG -= app_bundle
 
+# If release build
+CONFIG(release, debug|release) {
+    DEFINES += QT_NO_DEBUG_OUTPUT
+}
+
 INCLUDEPATH += src
 
 DEPENDPATH += ../messagehandler/lib/include

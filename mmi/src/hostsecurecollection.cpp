@@ -1,6 +1,10 @@
 #include "hostsecurecollection.h"
 
-
+//!
+//! \brief HostSecureCollection::HostSecureCollection
+//! Create objects and setup connections
+//! \param a_parent
+//!
 HostSecureCollection::HostSecureCollection( QObject* a_parent )
    : QObject { a_parent }
    , m_mmiMqttClient { new MmiMqttClient( this ) }

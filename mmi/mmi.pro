@@ -8,6 +8,11 @@ DEPENDPATH += ../messagehandler/lib/include
 INCLUDEPATH += ../messagehandler/lib/include
 LIBS += -L../messagehandler/lib -lmessagehandler
 
+# If release build
+CONFIG(release, debug|release) {
+    DEFINES += QT_NO_DEBUG_OUTPUT
+}
+
 SOURCES += \
     main.cpp \
     src/hostsecurecollection.cpp \

@@ -50,6 +50,7 @@ Pane {
                   model: root.mqttStatusTable
                   delegate: Label {
                      text: modelData.title
+                     Layout.alignment: Qt.AlignTop
                   }
                }
 

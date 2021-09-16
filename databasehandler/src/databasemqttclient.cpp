@@ -8,6 +8,7 @@
 DatabaseMqttClient::DatabaseMqttClient( QObject* a_parent )
    : MqttClientBase { a_parent }
 {
+   connectToHost();
 }
 
 //!

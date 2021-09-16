@@ -1,15 +1,32 @@
 #include "devicemodel.h"
 
+//!
+//! \brief DeviceModel::DeviceModel
+//! \param a_parent
+//!
 DeviceModel::DeviceModel( QObject* a_parent )
    : QAbstractListModel { a_parent }
 { }
 
+//!
+//! \brief DeviceModel::rowCount
+//! \param a_parent
+//! \return How many items are in the model
+//!
 int DeviceModel::rowCount( const QModelIndex& a_parent ) const
 {
    Q_UNUSED( a_parent )
    return m_list.size();
 }
 
+//!
+//! \brief DeviceModel::data
+//! Gets the correct item in the list based on \a a_index and returns
+//! the value based on \a a_role
+//! \param a_index
+//! \param a_role
+//! \return QVariant to be displayed in the UI
+//!
 QVariant DeviceModel::data( const QModelIndex& a_index, int a_role ) const
 {
    if ( !a_index.isValid() )
@@ -28,6 +45,10 @@ QVariant DeviceModel::data( const QModelIndex& a_index, int a_role ) const
    return QVariant();
 }
 
+//!
+//! \brief DeviceModel::roleNames
+//! \return QHash describing roles that are accecable in QML
+//!
 QHash< int, QByteArray > DeviceModel::roleNames() const
 {
    static QHash< int, QByteArray > roles = {
@@ -41,6 +62,12 @@ QHash< int, QByteArray > DeviceModel::roleNames() const
    return roles;
 }
 
+//!
+//! \brief DeviceModel::deviceChanged
+//! Update the device in the list and notify the UI to reload
+//! \param a_deviceId
+//! \param a_sample
+//!
 void DeviceModel::deviceChanged( const QString& a_deviceId, const MsgDevice& a_sample )
 {
    const auto iter = std::find_if( std::begin( m_list ),
@@ -63,6 +90,11 @@ void DeviceModel::deviceChanged( const QString& a_deviceId, const MsgDevice& a_s
    }
 }
 
+//!
+//! \brief DeviceModel::deviceRemoved
+//! Remove \a a_deviceId item from list and notify the UI to reload
+//! \param a_deviceId
+//!
 void DeviceModel::deviceRemoved( const QString& a_deviceId )
 {
    const auto iter = std::find_if( std::begin( m_list ),

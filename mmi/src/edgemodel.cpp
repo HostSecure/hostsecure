@@ -1,16 +1,33 @@
 #include "edgemodel.h"
 
+//!
+//! \brief EdgeModel::EdgeModel
+//! \param a_parent
+//!
 EdgeModel::EdgeModel( QObject* a_parent )
    : QAbstractListModel { a_parent }
 {
 }
 
+//!
+//! \brief EdgeModel::rowCount
+//! \param a_parent
+//! \return Returns how many items are in the model
+//!
 int EdgeModel::rowCount( const QModelIndex &a_parent ) const
 {
    Q_UNUSED( a_parent )
    return m_list.size();
 }
 
+//!
+//! \brief EdgeModel::data
+//! //! Gets the correct item in the list based on \a a_index and returns
+//! the value based on \a a_role
+//! \param a_index
+//! \param a_role
+//! \return QVariant to be displayed in the UI
+//!
 QVariant EdgeModel::data( const QModelIndex &a_index, int a_role ) const
 {
    if ( !a_index.isValid() )
@@ -26,6 +43,10 @@ QVariant EdgeModel::data( const QModelIndex &a_index, int a_role ) const
    return QVariant();
 }
 
+//!
+//! \brief EdgeModel::roleNames
+//! \return QHash describing roles that are accecable in QML
+//!
 QHash< int, QByteArray > EdgeModel::roleNames() const
 {
    static QHash< int, QByteArray > roles = {
@@ -36,9 +57,15 @@ QHash< int, QByteArray > EdgeModel::roleNames() const
    return roles;
 }
 
+//!
+//! \brief EdgeModel::edgeChanged
+//! Add or update an edge and notify the UI to reload
+//! \param a_edgeId
+//! \param a_sample
+//!
 void EdgeModel::edgeChanged( const QString& a_edgeId, const MsgEdge& a_sample )
 {
-   qInfo() << "Edge updated: " << a_edgeId << a_sample.macaddress;
+   qDebug() << "Edge updated: " << a_edgeId << a_sample.macaddress;
 
    auto iter = std::find_if( m_list.begin(),
                              m_list.end(),
@@ -63,9 +90,14 @@ void EdgeModel::edgeChanged( const QString& a_edgeId, const MsgEdge& a_sample )
    }
 }
 
+//!
+//! \brief EdgeModel::edgeRemoved
+//! Remove an edge and notify the UI to reload
+//! \param a_edgeId
+//!
 void EdgeModel::edgeRemoved( const QString& a_edgeId )
 {
-   qInfo() << "Edge removed: " << a_edgeId;
+   qDebug() << "Edge removed: " << a_edgeId;
 
    const auto iter = std::find_if( std::begin( m_list ),
                                    std::end( m_list ),
@@ -82,9 +114,17 @@ void EdgeModel::edgeRemoved( const QString& a_edgeId )
    }
 }
 
+//!
+//! \brief EdgeModel::deviceChanged
+//! Find the edge based on \a a_edgeId then pass the received \a a_deviceId and \a a_sample
+//! to the associated edge.
+//! \param a_edgeId
+//! \param a_deviceId
+//! \param a_sample
+//!
 void EdgeModel::deviceChanged( const QString& a_edgeId, const QString& a_deviceId, const MsgDevice& a_sample )
 {
-   qInfo() << "Device updated: " << a_edgeId << a_deviceId << a_sample.deviceSerial;
+   qDebug() << "Device updated: " << a_edgeId << a_deviceId << a_sample.deviceSerial;
 
    auto iter = std::find_if( m_list.begin(),
                              m_list.end(),
@@ -102,9 +142,16 @@ void EdgeModel::deviceChanged( const QString& a_edgeId, const QString& a_deviceI
    }
 }
 
+//!
+//! \brief EdgeModel::deviceRemoved
+//! Find the edge based on \a a_edgeId then pass the received \a a_deviceId and
+//! to the associated edge to be removed.
+//! \param a_edgeId
+//! \param a_deviceId
+//!
 void EdgeModel::deviceRemoved( const QString& a_edgeId, const QString& a_deviceId )
 {
-   qInfo() << "Device removed: " << a_edgeId << a_deviceId;
+   qDebug() << "Device removed: " << a_edgeId << a_deviceId;
 
    auto iter = std::find_if( m_list.begin(),
                              m_list.end(),

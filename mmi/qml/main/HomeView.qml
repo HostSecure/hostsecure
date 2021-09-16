@@ -19,11 +19,28 @@ Pane {
          width: ListView.view.width - scrollBar.width
          radius: 5
 
-         contentItem: Item {
+         Item {
             id: rootItem
-            enabled: model.isOnline
+            width: parent.width
+            implicitHeight: mainColumn.implicitHeight
+
+            TransparentPane {
+               rotation: -20
+               anchors.centerIn: parent
+               Material.elevation: 10
+               visible: !model.isOnline
+               z: 2
+
+               Label {
+                  text: "OFFLINE"
+                  font.pixelSize: 25
+                  font.bold: true
+               }
+            }
 
             ColumnLayout {
+               id: mainColumn
+               enabled: model.isOnline
                spacing: 10
                anchors.left: parent.left
                anchors.right: parent.right
@@ -31,7 +48,7 @@ Pane {
                RowLayout {
                   Icon {
                      icon.name: "computer"
-                     icon.color: rootItem.enabled ? Material.foreground : Material.hintTextColor
+                     icon.color: mainColumn.enabled ? Material.foreground : Material.hintTextColor
                      icon.height: 30
                      icon.width: 30
                   }
