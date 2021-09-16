@@ -2,6 +2,9 @@
 #include "msgbase.h"
 #include <QString>
 
+//!
+//! \brief The MsgEdge struct
+//!
 struct MsgEdge : public MsgBase
 {
    MsgEdge() = default;

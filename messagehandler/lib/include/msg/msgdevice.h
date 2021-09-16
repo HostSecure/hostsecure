@@ -2,6 +2,9 @@
 #include "msgbase.h"
 #include <QString>
 
+//!
+//! \brief The MsgDevice struct
+//!
 struct MsgDevice : public MsgBase
 {
    MsgDevice() = default;

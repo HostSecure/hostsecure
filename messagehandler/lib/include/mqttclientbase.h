@@ -1,7 +1,12 @@
 #pragma once
 #include <QMqttClient>
+#include <QTimer>
 #include <msg/msgbase.h>
 
+//!
+//! \brief The MqttClientBase class
+//! Contains base functionality for the MQTT client
+//!
 class MqttClientBase : public QMqttClient
 {
    Q_OBJECT
@@ -34,5 +39,6 @@ protected:
 
 private:
    Q_DISABLE_COPY_MOVE( MqttClientBase )
+   QTimer m_reconnectTimer;
 };
 

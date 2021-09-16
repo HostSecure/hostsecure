@@ -1,6 +1,9 @@
 #pragma once
 #include <QJsonObject>
 
+//!
+//! \brief The MsgBase struct
+//!
 struct MsgBase
 {
    virtual QJsonObject toJson() const = 0;

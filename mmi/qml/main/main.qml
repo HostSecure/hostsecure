@@ -8,6 +8,8 @@ ApplicationWindow {
    id: window
    width: 640
    height: 520
+   minimumWidth: 600
+   minimumHeight: 500
    visible: true
    title: qsTr("Host Secure")
 

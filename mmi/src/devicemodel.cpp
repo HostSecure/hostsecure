@@ -73,7 +73,7 @@ void DeviceModel::deviceChanged( const QString& a_deviceId, const MsgDevice& a_s
    const auto iter = std::find_if( std::begin( m_list ),
                                    std::end( m_list ),
                                    [ a_deviceId ]( const auto& a_item ) {
-      return a_deviceId == a_item.deviceId;
+      return a_deviceId == a_item.deviceSerial;
    } );
 
    if ( iter != std::end( m_list ) )
@@ -100,7 +100,7 @@ void DeviceModel::deviceRemoved( const QString& a_deviceId )
    const auto iter = std::find_if( std::begin( m_list ),
                                    std::end( m_list ),
                                    [ a_deviceId ]( const auto& a_item ) {
-      return a_deviceId == a_item.deviceId;
+      return a_deviceId == a_item.deviceSerial;
    } );
 
    if ( iter != std::end( m_list ) )
