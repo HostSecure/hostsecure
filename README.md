@@ -19,6 +19,7 @@ As an example security service, the USBGuard USB Whitelisting mechanism was chos
 - For this project, release version 1.0.0 was used.
 - Remember to configure the service correct according to the instruction, otherwise you might block all your computer USB devices.
 - Alternatively, the USBGuard can be downloaded using common Linux packet managers, such as DNF/YUM (Fedora/CentOS/Redhat) or APT/APT-Get (Ubuntu)
+- Our project used the USBGuard RPM (Version 1.0.0) package from the official Fedora Linux repository
 ```
 # To start the service
 sudo systemctl start usbguard
