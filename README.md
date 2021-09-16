@@ -12,21 +12,25 @@ Optional
 - [MQTT-explorer](http://mqtt-explorer.com/)
 
 
-##USBGuard
+## USBGuard
 As an example security service, the USBGuard USB Whitelisting mechanism was chosen as a Security Service integrated with the Endpoint Agent
 - [Usbguard](https://usbguard.github.io/)
 - [Installation](https://usbguard.github.io/)
-- Remember to configure the service correct according to the instruction,
-- otherwise you might block all your computer usb devices.
+- - For this project, release version 1.0.0 was used.
+- Remember to configure the service correct according to the instruction, otherwise you might block all your computer USB devices.
+- Alternatively, the USBGuard can be downloaded using common Linux packet managers, such as DNF/YUM (Fedora/CentOS/Redhat) or APT/APT-Get (Ubuntu)
 ```
 # To start the service
 sudo systemctl start usbguard
+sudo systemctl start usbguard-dbus
 
 # To stop the service
 sudo systemctl stop usbguard
+sudo systemctl stop usbguard-dbus
 
 # To verify the status of the service
 sudo systemctl status usbguard
+sudo systemctl status usbguard-dbus
 ```
 
 
