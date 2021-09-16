@@ -7,10 +7,8 @@ This installation guide is based on Debian OS (Linux).
 
 ## Prerequisites
 - [Qt 6.1.3](https://www.qt.io/download)
-
-Optional:
-- [Mosquitto](https://mosquitto.org/download/)
-- [MQTT-explorer](http://mqtt-explorer.com/)
+- [Mosquitto](https://mosquitto.org/download/) (Optional)
+- [MQTT-explorer](http://mqtt-explorer.com/) (Optional)
 
 ## Build project
 Open HostSecure.pro in QtCreator and choose which application you want to build. 
