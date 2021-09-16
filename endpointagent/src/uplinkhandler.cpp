@@ -33,6 +33,10 @@ UplinkHandler::UplinkHandler(QObject *a_parent)
    setWillQoS( 0 );
    setKeepAlive( 5 );
 
+   QObject::connect( this, &QMqttClient::stateChanged, this, []( ClientState state ) {
+      qInfo() << "State changed: " << state;
+   } );
+
    connectToHost();
 }
 
