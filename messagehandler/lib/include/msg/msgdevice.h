@@ -9,7 +9,7 @@ struct MsgDevice : public MsgBase
 {
    MsgDevice() = default;
    MsgDevice( const MsgDevice& ) = default;
-   bool operator==( const MsgDevice& ) const = default;
+   //bool operator==( const MsgDevice& ) const = default;
 
    QJsonObject toJson() const override;
    bool fromJson( const QJsonObject& a_msg ) override;
