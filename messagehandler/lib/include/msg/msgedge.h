@@ -9,7 +9,6 @@ struct MsgEdge : public MsgBase
 {
    MsgEdge() = default;
    MsgEdge( const MsgEdge& ) = default;
-   //bool operator==( const MsgEdge& ) const = default;
 
    QJsonObject toJson() const override;
    bool fromJson( const QJsonObject& a_msg ) override;

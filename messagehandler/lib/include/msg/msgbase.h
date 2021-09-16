@@ -12,5 +12,4 @@ struct MsgBase
 protected:
    MsgBase() = default;
    MsgBase( const MsgBase& ) = default;
-   //bool operator==( const MsgBase&) const = default;
 };
