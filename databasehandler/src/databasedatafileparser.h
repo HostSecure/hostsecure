@@ -5,7 +5,7 @@ class DatabaseHandler;
 //!
 //! \brief The DatabaseDataFileParser class
 //! The code is based on parsing csv files to make it easy to create your own config files and add your own data
-//! In reality, the parser wouldd be configured to parse data from predefined sources, which is most likely not in the csv format.
+//! In reality, the parser would be configured to parse data from predefined sources, which is most likely not in the csv format.
 //!
 class DatabaseDataFileParser
 {

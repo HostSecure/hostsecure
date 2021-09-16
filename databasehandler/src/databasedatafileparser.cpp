@@ -5,7 +5,10 @@
 #include <QFile>
 #include <QFileInfo>
 
-//! A proper database to look into can be found here: http://www.linux-usb.org/usb-ids.html
+//!
+//! \brief The parseDeviceProductVendor static function
+//! Parses a csv file and populates the productvendor database table
+//!
 void DatabaseDataFileParser::parseDeviceProductVendor( DatabaseHandler& a_dbHandler )
 {
    const char* dataDir = getenv( "HOSTSECURE_DATA_DIR" );
@@ -53,6 +56,10 @@ void DatabaseDataFileParser::parseDeviceProductVendor( DatabaseHandler& a_dbHand
    }
 }
 
+//!
+//! \brief The parseDeviceProductVendor static function
+//! Parses a csv file and populates the virushash database table
+//!
 void DatabaseDataFileParser::parseVirusHash( DatabaseHandler& a_dbHandler )
 {
    const char* dataDir = getenv("HOSTSECURE_DATA_DIR");

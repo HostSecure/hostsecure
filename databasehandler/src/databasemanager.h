@@ -5,6 +5,11 @@ class MsgEdge;
 class MsgDevice;
 class DatabaseHandler;
 class DatabaseMqttClient;
+//!
+//! \brief The DatabaseManager class
+//! The manager of the databasehandler component. It is responsible for the communication between the Mqtt client
+//! and the databasehandler API.
+//!
 class DatabaseManager : public QObject
 {
     Q_OBJECT

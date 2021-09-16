@@ -1,15 +1,22 @@
 #include "databasemqttclient.h"
 #include <QJsonDocument>
 
+//!
+//! \brief The DatabaseMqttClient constructor
+//!  Automatically connects to the Mqtt system
+//!
 DatabaseMqttClient::DatabaseMqttClient( QObject* a_parent )
    : MqttClientBase { a_parent }
 {
 }
 
+//!
+//! \brief The brokerConnected function
+//!  Called when the client connects to the Mqtt system.
+//!  Sets up subscriptions to relevant updates
+//!
 void DatabaseMqttClient::brokerConnected()
 {
-   qInfo() << "Broker connected!";
-
    const QMqttTopicFilter topicFilter( "edges/#" ); //! Subscribe with wildcard
    auto edgeSub = subscribe( topicFilter );
    if ( edgeSub != nullptr )
@@ -19,15 +26,17 @@ void DatabaseMqttClient::brokerConnected()
    }
 }
 
+//!
+//! \brief The incomingEdge function
+//!  Called when an Edge Node related message is received
+//!  Parses the message to see if its related to the Edge Node as a whole,
+//!  or to a specific Device connected to the Edge Node, and forwards the data accordingly
+//!
 void DatabaseMqttClient::incomingEdge( QMqttMessage a_sample )
 {
    QJsonDocument document = QJsonDocument::fromJson( a_sample.payload() );
    const auto levelCount = a_sample.topic().levelCount();
    const auto levels = a_sample.topic().levels();
-
-   qInfo() << "Message rc: " << a_sample.topic().name() << "\n" << a_sample.payload();
-   qInfo() << "Size: " << levelCount;
-   qInfo() << "Levels: " << levels;
 
    if ( levelCount >= 2 )
    {

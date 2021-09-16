@@ -2,6 +2,10 @@
 #include <QString>
 
 class DatabaseHandler;
+//!
+//! \brief The TestHandler class
+//! A class used to test and verify the databasehandler API and its queries.
+//!
 class TestHandler
 {
 public:

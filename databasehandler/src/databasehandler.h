@@ -2,13 +2,15 @@
 #include <QString>
 
 class QSqlQuery;
-
+//!
+//! \brief The DatabaseHandler class
+//! Creates the required database tables and provides an API to run predefined queries
+//! All functions should be assumed to throw an std::exception upon failure
+//!
 class DatabaseHandler
 {
 public:
     DatabaseHandler( const QString& a_databasePath );
-
-    // All functions should be assumed to throw std::exceptions upon failure
 
     // Edge node
     struct EdgeNode

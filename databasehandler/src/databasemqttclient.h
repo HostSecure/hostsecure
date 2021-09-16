@@ -3,6 +3,10 @@
 #include <msg/msgedge.h>
 #include <msg/msgdevice.h>
 
+//!
+//! \brief The DatabaseMqttClient class
+//! Handles communication with external entities
+//!
 class DatabaseMqttClient : public MqttClientBase
 {
     Q_OBJECT

@@ -9,7 +9,12 @@ namespace
 QFile logFile;
 }
 
-// Taken from qInstallMessageHandler example code
+//!
+//! \brief The loghandler function
+//!  Automcatically called by Qt when a qInfo, qDebug,  qWarning, qCritical, or qFatal is called
+//!  Logs qWarning, qCritical, and qFatal three to file,
+//!  The code is strongly inspired by the qInstallMessageHandler example code
+//!
 void loghandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
     switch (type) {
@@ -71,6 +76,10 @@ void loghandler(QtMsgType type, const QMessageLogContext &context, const QString
     }
 }
 
+//!
+//! \brief The LogHandler constructor
+//! Handles the logging setup
+//!
 LogHandler::LogHandler()
 {
     QString logFileName = QDateTime::currentDateTime().toString() + ".txt";
@@ -107,6 +116,10 @@ LogHandler::LogHandler()
     }
 }
 
+//!
+//! \brief The LogHandler desctructor
+//! Handles cleanup of the logger
+//!
 LogHandler::~LogHandler()
 {
     qInstallMessageHandler(0);

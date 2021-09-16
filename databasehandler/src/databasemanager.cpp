@@ -5,6 +5,10 @@
 
 #include <QTime>
 
+//!
+//! \brief The DatabaseManager constructor
+//! Sets up the connections between the Mqtt client and the database
+//!
 DatabaseManager::DatabaseManager(const QString &a_databaseName, QObject *a_parent)
     : QObject(a_parent)
     , m_DatabaseHandler(new DatabaseHandler(a_databaseName))
@@ -16,6 +20,10 @@ DatabaseManager::DatabaseManager(const QString &a_databaseName, QObject *a_paren
     connect( m_MqttCient.get(), &DatabaseMqttClient::deviceRemoved, this, &DatabaseManager::deviceRemoved );
 }
 
+//!
+//! \brief The edgeChanged function
+//!  Registers or updates an Edge Node when an Edge Node update is received from the Mqtt client
+//!
 void DatabaseManager::edgeChanged(const QString &a_edgeId, const MsgEdge &a_sample)
 {
     try
@@ -28,6 +36,10 @@ void DatabaseManager::edgeChanged(const QString &a_edgeId, const MsgEdge &a_samp
     }
 }
 
+//!
+//! \brief The edgeRemoved function
+//!  Removes an Edge Node when a remove Edge Node update is received from the Mqtt client
+//!
 void DatabaseManager::edgeRemoved(const QString &a_edgeId)
 {
     try
@@ -41,6 +53,10 @@ void DatabaseManager::edgeRemoved(const QString &a_edgeId)
     }
 }
 
+//!
+//! \brief The deviceChanged function
+//!  Registers, logs, and updates a Device connection status when a Device update is received from the Mqtt client
+//!
 void DatabaseManager::deviceChanged(const QString &a_edgeId, const QString &a_deviceId, const MsgDevice &a_sample)
 {
     QStringList vendorProductIds = a_deviceId.split(":");
@@ -63,6 +79,10 @@ void DatabaseManager::deviceChanged(const QString &a_edgeId, const QString &a_de
     }
 }
 
+//!
+//! \brief The deviceRemoved function
+//!  Removes and logs a Device connection status when a remove Device update is received from the Mqtt client
+//!
 void DatabaseManager::deviceRemoved(const QString &a_edgeId, const QString &a_deviceId, const QString& a_deviceSerial)
 {
     QStringList vendorProductIds = a_deviceId.split(":");

@@ -13,28 +13,14 @@ namespace
 const QString DEVICE_STATUS_UNKNOWN = "U";
 const QString DEVICE_STATUS_WHITELISTED = "W";
 const QString DEVICE_STATUS_BLACKLISTED = "B";
-
-//const QString CREATE = "CREATE TABLE ";
-//const QString INSERT = "INSERT INTO ";
-//const QString PRIMARY = "PRIMARY KEY";
-//const QString FOREIGN = "FOREIGN KEY";
-
-//const QString EDGENODE = "edgenode";
-//const QString EDGENODEID = "macaddress";
-//const QString EDGENODEIDTYPE = "VARCHAR(8)";
-//const QString EDGENODEDESCRIPTTION = "nodedescription";
-//const QString EDGENODEDESCRIPTIONTYPE = "VARCHAR(50)";
-
-//const QString VENDOR = "vendor";
-//const QString VENDORID = "vendorid";
-//const QString VENDORIDTYPE = "VARCHAR(4)";
-//const QString VENDORNAME = "vendorname";
-//const QString VENDORNAMETYPE = "VARCHAR(30)";
 }
 
+//!
+//! \brief The DatabaseHandler constructor
+//! Creates the database and its tables and populates the productvendor and virushash tables
+//!
 DatabaseHandler::DatabaseHandler(const QString& a_databasePath)
 {
-    //TODO: Handle differently, e.g. by using a SELECT call on some table to make it support other db types (e.g. MariaDB/MySQL)
     bool exists = QFile::exists(a_databasePath);
     if(!exists)
     {
@@ -79,6 +65,7 @@ DatabaseHandler::DatabaseHandler(const QString& a_databasePath)
                 qFatal("Failed to create productvendor table: %s", query.lastError().text().toStdString().c_str());
             }
 
+            // An auto ID is used to decrease the number of columns required in referencing tables
             if(!query.exec("CREATE TABLE device(id INTEGER PRIMARY KEY AUTOINCREMENT, productid VARCHAR(4), vendorid VARCHAR(4), serialnumber VARCHAR(8), status CHAR(1) NOT NULL, "
                        "UNIQUE(productid, vendorid, serialnumber), "
                        "FOREIGN KEY(productid, vendorid) REFERENCES productvendor(productid, vendorid))"))
@@ -111,6 +98,10 @@ DatabaseHandler::DatabaseHandler(const QString& a_databasePath)
     }
 }
 
+//!
+//! \brief The registerOrUpdateEdgeNode function
+//! Registers a new Edge Node if it doesn't exist, or updates an existing one if it exists
+//!
 void DatabaseHandler::registerOrUpdateEdgeNode(const QString &a_macAddress, bool a_isOnline, const QString& a_lastHeartbeatTimestamp) const
 {
     QSqlQuery query;
@@ -128,6 +119,10 @@ void DatabaseHandler::registerOrUpdateEdgeNode(const QString &a_macAddress, bool
     }
 }
 
+//!
+//! \brief The getEdgeNode function
+//! Retrieves an Edge Node
+//!
 bool DatabaseHandler::getEdgeNode(EdgeNode &a_edgeNode, const QString &a_macAddress) const
 {
     bool success = false;
@@ -154,6 +149,10 @@ bool DatabaseHandler::getEdgeNode(EdgeNode &a_edgeNode, const QString &a_macAddr
     return success;
 }
 
+//!
+//! \brief The getAllEdgeNodeKeys function
+//! Retrieves all Edge Node mac addresses
+//!
 void DatabaseHandler::getAllEdgeNodeKeys(QVector<QString> &a_macAddresses) const
 {
     try
@@ -167,6 +166,10 @@ void DatabaseHandler::getAllEdgeNodeKeys(QVector<QString> &a_macAddresses) const
     }
 }
 
+//!
+//! \brief The getAllEdgeNodes function
+//! Retrieves all Eedge Nodes
+//!
 void DatabaseHandler::getAllEdgeNodes(std::vector<std::unique_ptr<EdgeNode> > &a_edgeNodes) const
 {
     QSqlQuery query;
@@ -188,6 +191,10 @@ void DatabaseHandler::getAllEdgeNodes(std::vector<std::unique_ptr<EdgeNode> > &a
     }
 }
 
+//!
+//! \brief The setEdgeNodeOnlineStatus function
+//! Updates the online status of an Edge Node
+//!
 void DatabaseHandler::setEdgeNodeOnlineStatus(const QString &a_macAddress, bool a_isOnline, const QString &a_lastHeartbeatTimestamp)
 {
     QSqlQuery query;
@@ -212,6 +219,10 @@ void DatabaseHandler::setEdgeNodeOnlineStatus(const QString &a_macAddress, bool 
     }
 }
 
+//!
+//! \brief The getOnlineEdgeNodes function
+//! Retrieves all the online Edge Nodes
+//!
 void DatabaseHandler::getOnlineEdgeNodes(QVector<QString> &a_macAddresses) const
 {
     QSqlQuery query;
@@ -230,6 +241,10 @@ void DatabaseHandler::getOnlineEdgeNodes(QVector<QString> &a_macAddresses) const
     }
 }
 
+//!
+//! \brief The registerDevice function
+//! Registers a Device if it does not already exist
+//!
 void DatabaseHandler::registerDevice(const QString &a_productId, const QString &a_vendorId, const QString &a_serialNumber ) const
 {
     QSqlQuery query;
@@ -255,6 +270,10 @@ void DatabaseHandler::registerDevice(const QString &a_productId, const QString &
     }
 }
 
+//!
+//! \brief The getDevice function
+//! Retrieves a Device
+//!
 bool DatabaseHandler::getDevice(Device &a_device, const QString &a_productId, const QString &a_vendorId, const QString &a_serialNumber) const
 {
     bool success = false;
@@ -283,6 +302,10 @@ bool DatabaseHandler::getDevice(Device &a_device, const QString &a_productId, co
     return success;
 }
 
+//!
+//! \brief The getAllDevices function
+//! Retrieves all Devices
+//!
 void DatabaseHandler::getAllDevices(std::vector<std::unique_ptr<Device> > &a_devices) const
 {
     QSqlQuery query;
@@ -304,6 +327,10 @@ void DatabaseHandler::getAllDevices(std::vector<std::unique_ptr<Device> > &a_dev
     }
 }
 
+//!
+//! \brief The setDeviceBlacklisted function
+//! Updates the Device status to Blacklisted
+//!
 void DatabaseHandler::setDeviceBlacklisted(const QString& a_productId, const QString& a_vendorId, const QString& a_serialNumber) const
 {
     try
@@ -317,6 +344,10 @@ void DatabaseHandler::setDeviceBlacklisted(const QString& a_productId, const QSt
     }
 }
 
+//!
+//! \brief The isDeviceBlackListed function
+//! Checks if a Device is Blacklisted
+//!
 bool DatabaseHandler::isDeviceBlackListed(const QString& a_productId, const QString& a_vendorId, const QString& a_serialNumber) const
 {
     bool retVal = true; // Assume the worst
@@ -333,6 +364,10 @@ bool DatabaseHandler::isDeviceBlackListed(const QString& a_productId, const QStr
     return retVal;
 }
 
+//!
+//! \brief The setDeviceWhitelisted function
+//! Updates the Device status to Whitelisted
+//!
 void DatabaseHandler::setDeviceWhitelisted(const QString& a_productId, const QString& a_vendorId, const QString& a_serialNumber) const
 {
     try
@@ -346,6 +381,10 @@ void DatabaseHandler::setDeviceWhitelisted(const QString& a_productId, const QSt
     }
 }
 
+//!
+//! \brief The isDeviceWhiteListed function
+//! Checks if a Device is Whitelisted
+//!
 bool DatabaseHandler::isDeviceWhiteListed(const QString& a_productId, const QString& a_vendorId, const QString& a_serialNumber) const
 {
     bool retVal = false;
@@ -362,6 +401,10 @@ bool DatabaseHandler::isDeviceWhiteListed(const QString& a_productId, const QStr
     return retVal;
 }
 
+//!
+//! \brief The registerConnectedDevice function
+//! Registers a connection between a Device and the Edge Node it is connected to
+//!
 void DatabaseHandler::registerConnectedDevice(const QString &a_edgeNodeMacAddress, const QString &a_deviceProductId, const QString &a_deviceVendorId, const QString &a_deviceSerialNumber, const QString &a_timestamp)
 {
     QSqlQuery query;
@@ -375,11 +418,6 @@ void DatabaseHandler::registerConnectedDevice(const QString &a_edgeNodeMacAddres
     query.bindValue(3, a_deviceVendorId);
     query.bindValue(4, a_deviceSerialNumber);
 
-//    "INSERT INTO log(edgenodemacaddress, deviceid, logtime, loginfo) "
-//                      "SELECT ?, device.id, ?, ? "
-//                      "FROM device "
-//                      "WHERE device.productid = ? AND device.vendorid = ? AND device.serialnumber = ?"
-
     if(!query.exec())
     {
         qCritical() << __PRETTY_FUNCTION__ << "Failed to register connected device: " << query.lastError();
@@ -387,6 +425,10 @@ void DatabaseHandler::registerConnectedDevice(const QString &a_edgeNodeMacAddres
     }
 }
 
+//!
+//! \brief The unregisterConnectedDevicesOnEdgeNode function
+//! Unregisters all Device connections to an Edge Node
+//!
 void DatabaseHandler::unregisterConnectedDevicesOnEdgeNode(const QString &a_edgeNodeMacAddress)
 {
     QSqlQuery query;
@@ -401,6 +443,10 @@ void DatabaseHandler::unregisterConnectedDevicesOnEdgeNode(const QString &a_edge
     }
 }
 
+//!
+//! \brief The unregisterConnectedDevice function
+//! Unregisters a connection between a Device and the Edge Node it was connected to
+//!
 void DatabaseHandler::unregisterConnectedDevice(const QString &a_edgeNodeMacAddress, const QString &a_deviceProductId, const QString &a_deviceVendorId, const QString &a_deviceSerialNumber)
 {
     QSqlQuery query;
@@ -418,6 +464,10 @@ void DatabaseHandler::unregisterConnectedDevice(const QString &a_edgeNodeMacAddr
     }
 }
 
+//!
+//! \brief The registerConnectedDevice function
+//! Retrieves all connnections between Devicees and Edge Nodes
+//!
 void DatabaseHandler::getAllConnectedDevices(std::vector<std::unique_ptr<ConnectedDevice> > &a_connectedDevices)
 {
     QSqlQuery query;
@@ -442,6 +492,10 @@ void DatabaseHandler::getAllConnectedDevices(std::vector<std::unique_ptr<Connect
     }
 }
 
+//!
+//! \brief The registerProductVendor function
+//! Registers a product vendor combination
+//!
 void DatabaseHandler::registerProductVendor(const QString &a_productId, const QString &a_productName, const QString &a_vendorId, const QString &a_vendorName)
 {
     QSqlQuery query;
@@ -459,6 +513,10 @@ void DatabaseHandler::registerProductVendor(const QString &a_productId, const QS
     }
 }
 
+//!
+//! \brief The getProductVendor function
+//! Retrieves a product vendor combination
+//!
 bool DatabaseHandler::getProductVendor(ProductVendor& a_productVendor, const QString &a_productId, const QString a_vendorId)
 {
     bool success = false;
@@ -487,6 +545,10 @@ bool DatabaseHandler::getProductVendor(ProductVendor& a_productVendor, const QSt
     return success;
 }
 
+//!
+//! \brief The getAllProductVendors function
+//! Retrieves all product vendor combination
+//!
 void DatabaseHandler::getAllProductVendors(std::vector<std::unique_ptr<ProductVendor> >& a_productVendors)
 {
     QSqlQuery query;
@@ -509,6 +571,10 @@ void DatabaseHandler::getAllProductVendors(std::vector<std::unique_ptr<ProductVe
     }
 }
 
+//!
+//! \brief The registerVirusHash function
+//! Registers a virus file hash
+//!
 void DatabaseHandler::registerVirusHash(const QString &virusHash, const QString &a_description)
 {
     QSqlQuery query;
@@ -524,6 +590,10 @@ void DatabaseHandler::registerVirusHash(const QString &virusHash, const QString 
     }
 }
 
+//!
+//! \brief The getVirusHash function
+//! Retrieves a virus hash with description
+//!
 bool DatabaseHandler::getVirusHash(VirusHash &a_vHash, const QString &a_virusHash) const
 {
     bool success = false;
@@ -549,6 +619,10 @@ bool DatabaseHandler::getVirusHash(VirusHash &a_vHash, const QString &a_virusHas
     return success;
 }
 
+//!
+//! \brief The getAllVirusHashKeys function
+//! Retrieves all virus hashes
+//!
 void DatabaseHandler::getAllVirusHashKeys(QVector<QString> &a_virusHashes) const
 {
     try
@@ -562,6 +636,10 @@ void DatabaseHandler::getAllVirusHashKeys(QVector<QString> &a_virusHashes) const
     }
 }
 
+//!
+//! \brief The getAllVirusHashes function
+//! Retrieves all virus hashes with descriptions
+//!
 void DatabaseHandler::getAllVirusHashes(std::vector<std::unique_ptr<VirusHash> > &a_virusHashes) const
 {
     QSqlQuery query;
@@ -582,6 +660,10 @@ void DatabaseHandler::getAllVirusHashes(std::vector<std::unique_ptr<VirusHash> >
     }
 }
 
+//!
+//! \brief The isHashInVirusDatabase function
+//! Checks if a virus hash can be found in the database
+//!
 bool DatabaseHandler::isHashInVirusDatabase(const QString &a_hash) const
 {
     bool found = true; // Assume the worst
@@ -605,6 +687,10 @@ bool DatabaseHandler::isHashInVirusDatabase(const QString &a_hash) const
     return found;
 }
 
+//!
+//! \brief The logEvent function
+//! Logs an event related to a given Device on a given Edge Node
+//!
 void DatabaseHandler::logEvent(const QString& edgeNodeMacAddress, const QString& a_deviceProductId, const QString& a_deviceVendorId, const QString& a_deviceSerialNumber, const QString& a_timestamp, const QString& a_eventDescription)
 {
     QSqlQuery query;
@@ -626,6 +712,10 @@ void DatabaseHandler::logEvent(const QString& edgeNodeMacAddress, const QString&
     }
 }
 
+//!
+//! \brief The getLoggedEvent function
+//! Retrieves a specific logged event
+//!
 bool DatabaseHandler::getLoggedEvent(LogEvent& logEvent, const QString& a_edgeNodeMacAddress, const QString& a_deviceProductId, const QString& a_deviceVendorId, const QString& a_deviceSerialNumber, const QString& a_timestamp) const
 {
     bool success = false;
@@ -666,6 +756,10 @@ bool DatabaseHandler::getLoggedEvent(LogEvent& logEvent, const QString& a_edgeNo
     return success;
 }
 
+//!
+//! \brief The getAllLoggedEvents function
+//! Retrieves all logged events.
+//!
 void DatabaseHandler::getAllLoggedEvents(std::vector<std::unique_ptr<LogEvent> >& a_loggedEvents) const
 {
     QSqlQuery query;
@@ -692,6 +786,10 @@ void DatabaseHandler::getAllLoggedEvents(std::vector<std::unique_ptr<LogEvent> >
     }
 }
 
+//!
+//! \brief The getKeysFromTable function
+//! Helper function to retrieve the VARCHAR keys if a given table
+//!
 void DatabaseHandler::getKeysFromTable(const QString a_keyName, const QString &a_tableName, QVector<QString> &a_result) const
 {
     QSqlQuery query;
@@ -710,6 +808,10 @@ void DatabaseHandler::getKeysFromTable(const QString a_keyName, const QString &a
     }
 }
 
+//!
+//! \brief The setDeviceStatus function
+//! Helper function to set the status of a given Device
+//!
 void DatabaseHandler::setDeviceStatus(const QString& a_productId, const QString& a_vendorId, const QString& a_serialNumber, const QString& a_status) const
 {
     QSqlQuery query;
@@ -725,6 +827,10 @@ void DatabaseHandler::setDeviceStatus(const QString& a_productId, const QString&
     }
 }
 
+//!
+//! \brief The checkDeviceStatus function
+//! Helper function to check the status of a given Device
+//!
 bool DatabaseHandler::checkDeviceStatus(const QString& a_productId, const QString& a_vendorId, const QString& a_serialNumber, const QString& a_status) const
 {
     bool retVal = false;
