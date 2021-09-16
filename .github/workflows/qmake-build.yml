@@ -31,5 +31,8 @@ jobs:
       - name: Build project
         run: |
           ls
-          qmake -v
-          /home/runner/work/hostsecure/Qt/6.1.3/gcc_64/bin/qmake HostSecure.pro
+          mkdir build
+          cd build
+          qmake ..
+          qmake --build .
+          
