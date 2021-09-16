@@ -15,8 +15,8 @@ Optional
 ## USBGuard
 As an example security service, the USBGuard USB Whitelisting mechanism was chosen as a Security Service integrated with the Endpoint Agent
 - [Usbguard](https://usbguard.github.io/)
-- [Installation](https://usbguard.github.io/)
-- - For this project, release version 1.0.0 was used.
+- [Compilation & Installation](https://usbguard.github.io/documentation/compilation.html)
+- For this project, release version 1.0.0 was used.
 - Remember to configure the service correct according to the instruction, otherwise you might block all your computer USB devices.
 - Alternatively, the USBGuard can be downloaded using common Linux packet managers, such as DNF/YUM (Fedora/CentOS/Redhat) or APT/APT-Get (Ubuntu)
 ```
