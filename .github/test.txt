@@ -1,0 +1,1 @@
+Testing QMake build on GitHub Actions. Ignore this
