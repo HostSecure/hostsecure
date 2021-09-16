@@ -67,3 +67,12 @@ sudo service mosquitto start
 # To stop the service
 sudo service mosquitto stop
 ```
+
+## Database setup
+By default, the log, database, and database config files directory is set to be the directory above where the executable can be found.
+To change this location, set the environment HOSTSECURE_DATA_DIR to the wanted directory.
+
+To populate the productvendor table: Add a file HOSTSECURE_DATA_DIR/productvendors.txt with each line consisting of one productvendor pair like so: "<productid>,<productname>,<vendorid>,<vendorname>".
+To find the product and vendor ids, run the application, attach a device, and check the mmi as the mmi will show the combined id as vendor:product.
+
+To populate the virushash tale: Add a file HOSTSECURE_DATA_DIR/virushashes.txt with each line consisting of one virushash like so "<virushash>,<description>"
