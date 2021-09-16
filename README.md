@@ -12,6 +12,25 @@ Optional
 - [MQTT-explorer](http://mqtt-explorer.com/)
 
 
+##USBGuard
+As an example security service, the USBGuard USB Whitelisting mechanism was chosen as a Security Service integrated with the Endpoint Agent
+- [Usbguard](https://usbguard.github.io/)
+- [Installation](https://usbguard.github.io/)
+- Remember to configure the service correct according to the instruction,
+- otherwise you might block all your computer usb devices.
+```
+# To start the service
+sudo systemctl start usbguard
+
+# To stop the service
+sudo systemctl stop usbguard
+
+# To verify the status of the service
+sudo systemctl status usbguard
+```
+
+
+
 # Build guide
 To build the project we first need to build QtMqtt from source since this is only included in Qt for Automation.
 
