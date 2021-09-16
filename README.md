@@ -5,8 +5,6 @@ Keywords: Host Intrusion Detection System, Centralized Management, Cloud and Edg
 
 This installation guide is based on Debian OS (Linux).
 
----
-
 ## Prerequisites
 - [Qt 6.1.3](https://www.qt.io/download)
 
