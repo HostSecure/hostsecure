@@ -5,9 +5,11 @@
 #include <string>
 #include <map>
 
-//! Purpose:
-//! Detect anomalies from parsed log files
-//! receives data from Parser class
+//!
+//! \brief The Detector class (Halted)
+//! Purpose is for handling signature detections from services,
+//! and pre-compute security events before uploading to cloud
+//!
 class Detector : public QObject
 {
 public:

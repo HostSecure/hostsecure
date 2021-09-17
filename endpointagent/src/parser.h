@@ -5,9 +5,11 @@
 #include <map>
 #include "detector.h"
 
-/// Purpose:
-/// Parses log files from argument-passed filepaths upon start
-/// fresh data is sent to detector
+//!
+//! \brief The Parser class (Halted)
+//! Purpose is for parsing local service log files, and initial config files
+//! correlate and detect data anomalies
+//!
 class Parser : public QObject
 {
    Q_OBJECT

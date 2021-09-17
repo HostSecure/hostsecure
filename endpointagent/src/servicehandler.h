@@ -4,6 +4,11 @@
 #include <QMap>
 #include <QString>
 #include "uplinkhandler.h"
+//!
+//! \brief The ServiceHandler class
+//! Mediates communication between local services
+//! And up to cloud, manages events from/to local services
+//!
 
 class ServiceHandler : public QObject
 {

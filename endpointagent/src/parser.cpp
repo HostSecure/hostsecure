@@ -65,7 +65,6 @@ void Parser::readLogSource()
          {
             if(lineCount >= m_sourceOffset[ m_sourceName[ i ] ])
             {
-               // std::cout << "scanning new data from line " << lineCount << std::endl;
                m_DataHandler.scan(rawData, m_sourceName[ i ]);
             }
 

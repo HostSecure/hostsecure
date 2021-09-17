@@ -4,6 +4,10 @@
 #include <mqttclientbase.h>
 
 
+//!
+//! \brief The UplinkHandler class
+//! Communication mediator for MQTT and Local Services
+//!
 class UplinkHandler : public MqttClientBase
 {
    Q_OBJECT
