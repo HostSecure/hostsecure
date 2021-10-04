@@ -3,7 +3,7 @@ HostSecure IDS is a data-intensive security management platform for intrusion de
 
 Keywords: Host Intrusion Detection System, Centralized Management, Cloud and Edge Computing, MQTT, Relational Databases, Service-Oriented Design, Publish-Subscribe Architecture, Message-Oriented Middleware
 
-This installation guide is based on Debian OS (Linux).
+This installation guide is based on Debian OS (Linux). 
 
 ## Prerequisites
 - [Qt 6.1.3](https://www.qt.io/download)
